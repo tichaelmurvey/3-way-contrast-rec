@@ -2,6 +2,19 @@ function checkContrast(){
     color_one = getColor("one");
     color_two = getColor("two");
     console.log(color_one, color_two);
+    color_one_L = getLuminance(color_one.h, color_one.s, color_one.l);
+    color_two_L = getLuminance(color_two.h, color_two.s, color_two.l);
+    console.log(color_one_L, color_two_L);
+    let ratio;
+    if(color_one_L == color_two_L){
+        ratio = 0;
+    } else if(color_one_L > color_two_L){
+        ratio = (color_one_L + 0.05)/(color_two_L + 0.05);
+    } else {
+        ratio = (color_two_L + 0.05)/(color_one_L + 0.05);
+    }
+    console.log(ratio);
+    
 }
 
 function getColor(x){
@@ -59,4 +72,26 @@ function RGBtoHSL(r, g, b){
     s = Math.round(s*100);
     l = Math.round(l*100);
     return { h, s, l};
+}
+
+function getLuminance(R8bit, G8bit, B8bit){
+    RsRGB = R8bit/255
+    GsRGB = G8bit/255
+    BsRGB = B8bit/255
+    console.log(RsRGB, GsRGB, BsRGB);
+    R = getLumVals(RsRGB);
+    G = getLumVals(GsRGB);
+    B = getLumVals(BsRGB);
+    console.log(R, G, B);
+    L = (0.2126 * R) + (0.7152 * G) + (0.0722 * B);
+    return L;
+}
+
+function getLumVals(sRGB){
+    if(sRGB > 0.03928 ){
+        C = ((sRGB+0.055)/1.055)**2.4;
+    } else {
+        C = sRGB/12.92
+    }
+    return C;
 }
