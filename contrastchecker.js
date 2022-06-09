@@ -1,4 +1,4 @@
-//function that runs when button #rec is clicked
+//Event handler for Two color recommender (from one given color)
    function twoColorRec(){
         console.log("clicked");
         //get the value of the input fields
@@ -8,13 +8,48 @@
         var ratio = $("#ratio").val();
         colors = getSecondColor([r,g,b], ratio);
         console.log(colors);
+        $("#two-color-result").empty();
         colors.forEach(function(color){
             color.forEach(function(color){
-            $("#two-color-result").empty();
             $("#two-color-result").append("<p class='color-box'>"+color+"</p>");
             });
         });
     }
+
+//Event handler for three color recommender (from two given colors)
+function threeColorRec(){
+    console.log("starting threeColorRec");
+    //Get the value of the input fields
+    var r_one = $("#three-color-one-red").val();
+    var g_one = $("#three-color-one-green").val();
+    var b_one = $("#three-color-one-blue").val();
+    var r_two = $("#three-color-two-red").val();
+    var g_two = $("#three-color-two-green").val();
+    var b_two = $("#three-color-two-blue").val();
+    var ratio = $("#ratio").val();
+    colors = getThirdColor([r_one,g_one,b_one], [r_two,g_two,b_two], ratio);
+    $("#three-color-result").empty();
+    colors.forEach(function(color){
+        color.forEach(function(color){
+            $("#three-color-result").append("<p class='color-box'>"+color+"</p>");
+        });
+    });
+}
+
+//Event handler for three color recommender (with two stable colors, modifying one)
+function threeColorRecFromGivenColor(){
+    var r_stable_one = $("#three-color-stable-color-one-red").val();
+    var g_stable_one = $("#three-color-stable-color-one-green").val();
+    var b_stable_one = $("#three-color-stable-color-one-blue").val();
+    var r_stable_two = $("#three-color-stable-color-two-red").val();
+    var g_stable_two = $("#three-color-stable-color-two-green").val();
+    var b_stable_two = $("#three-color-stable-color-two-blue").val();
+    var r_change = $("#three-color-changeable-color-red").val();
+    var g_change = $("#three-color-changeable-color-green").val();
+    var b_change = $("#three-color-changeable-color-blue").val();
+    var ratio = $("#ratio").val();
+    colors = modifyThreeColor([r_stable_one,g_stable_one,b_stable_one], [r_stable_two,g_stable_two,b_stable_two], [r_change,g_change,b_change], ratio);
+}
 
 //Calculate contrast ratio between two colors
 function getContrast(rgb1, rgb2) {
@@ -22,7 +57,6 @@ function getContrast(rgb1, rgb2) {
     var lum2 = getLuminance(rgb2);
     return getRatio(lum1, lum2);
 }
-
 
 //Gets contrast ratio between two relative luminosities
 function getRatio(lum1, lum2){
@@ -51,7 +85,6 @@ function RGBtoLinear(rgb) {
     return [r, g, b];
 }
 
-
 //Convert linear RGB to sRGB
 function linearToSRGB(linear){
     var srgb = [];
@@ -67,14 +100,12 @@ function linearToSRGB(linear){
     return(srgb)
 }
 
-
 //Calculate compliant luminance above and below input luminance for a given ratio
 function secondLuminance(oldLuminance, desired_ratio) {
     darkOption = (oldLuminance + 0.05)/desired_ratio - 0.05 - 0.005; // to fudge a bit in the direction of more contrast for rounding errors with floating point
     lightOption = desired_ratio*(oldLuminance + 0.05) - 0.05 + 0.005;
     return([darkOption, lightOption]);
 }
-
 
 //Calculate compliant luminance for two other luminances (which don't necessarily contrast) at a given ratio
 function thirdLuminance(first_luminance, second_luminance, desired_ratio){
@@ -116,6 +147,7 @@ function thirdLuminance(first_luminance, second_luminance, desired_ratio){
     return(options);
 }
 
+//Return a set of colors which are complient with the supplied color
 function getSecondColor(rgb, desired_ratio){
     var lum = getLuminance(rgb);
     var options = secondLuminance(lum, desired_ratio);
@@ -126,23 +158,27 @@ function getSecondColor(rgb, desired_ratio){
     return(colors);
 }
 
+//Return a set of colors which are complient with both supplied colors
 function getThirdColor(rgb1, rgb2, desired_ratio){
+    console.log("Starting getThirdColor");
     var lum1 = getLuminance(rgb1);
+    console.log("lum1: " + lum1);
     var lum2 = getLuminance(rgb2);
+    console.log("lum2: " + lum2);
     var options = thirdLuminance(lum1, lum2, desired_ratio);
     colors = [];
     options.forEach(function(option){
-        colors.concat(makeColors(option))
-    });    
+        colors.push(makeColors(option));
+    });
+    console.log("colors: " + colors);
+    return(colors);
 }
 
+//Find the luminance value which meets the ratio with the stable color, and is closest to the luminance of the changing color
 function modifyTwoColor(stable_color, color_to_modify, desired_ratio){
     var stable_luminance = getLuminance(stable_color);
-    console.log("stable luminance: " + stable_luminance);
     var new_lum_options = secondLuminance(stable_luminance, desired_ratio);
-    console.log("new lum options: " + new_lum_options);
     var luminance_to_modify = getLuminance(color_to_modify);
-    console.log("luminance to modify: " + luminance_to_modify);
     var contrastOps = [];
     new_lum_options.forEach(function(new_lum){
         contrastOps.push(getRatio(new_lum, luminance_to_modify));
@@ -150,23 +186,41 @@ function modifyTwoColor(stable_color, color_to_modify, desired_ratio){
     console.log("contrast options: " + contrastOps);
     var best_option = new_lum_options[contrastOps.indexOf(Math.min(...contrastOps))];
     console.log("best option: " + best_option);
+    colors = modifyColors(best_option);
+    return(colors);
+}
 
+//Find the luminance value which meets the ratio with the two stable colors, and is closest to the luminance of the changing color
+function modifyThreeColor(stable_color_one, stable_color_two, color_to_modify, desired_ratio){
+    var stable_luminance_one = getLuminance(stable_color_one);
+    var stable_luminance_two = getLuminance(stable_color_two);
+    var luminance_to_modify = getLuminance(color_to_modify);
+    var contrastOps = [];
+    var new_lum_options = thirdLuminance(stable_luminance_one, stable_luminance_two, desired_ratio);
+    new_lum_options.forEach(function(new_lum){
+        contrastOps.push(getRatio(new_lum, luminance_to_modify));
+    });
+    var best_option = new_lum_options[contrastOps.indexOf(Math.min(...contrastOps))];
+    console.log("best option: " + best_option);
+    colors = modifyColors(color_to_modify, best_option);
+    return(colors);
 }
 
 //Generate colors from relative luminance
 function makeColors(luminance){
+    console.log("making colors for "+ luminance);
     var colors = [];
-    var coefficients = [0.2126, 0.7152, 0.0722];
+    const coefficients = [0.2126, 0.7152, 0.0722];
     //check for single color options
     for(i=0; i<3; i++){
         if(luminance/coefficients[i] <= 1 && luminance/coefficients[i] >= 0){
             var single_color_linear = luminance/coefficients[i];
             linearRGB = [0, 0, 0];
             linearRGB[i] = single_color_linear;
-            console.log("linear color: "+linearRGB);
             colors.push(linearToSRGB(linearRGB));
         }
     }
+    console.log("colors from makeColors: " + colors);
     return colors;
 }
 
@@ -174,6 +228,7 @@ function makeColors(luminance){
 function modifyColors(color, target_luminance){
     make_darker = (target_luminance < getLuminance(color)) ? true : false;
     console.log("original luminance: " + getLuminance(color));
+    console.log("target luminance: " + target_luminance);
     console.log("make darker: " + make_darker);
     hsl_color = rgbToHSL(color);
     console.log("hsl color: " + hsl_color);
@@ -182,87 +237,93 @@ function modifyColors(color, target_luminance){
     //Modify hue
     var current_option = [...hsl_color];
     var test_color = [...hsl_color];
-    for(i=0; i<360; i++){
-        test_color[0] += i/360;
-        if(test_color[0] > 1){
-            test_color[0] -= 1;
-        }
-        if(make_darker && getLuminance(hslToRGB(test_color)) < target_luminance){
+    var recExists = false;
+    test_color[0] = 0;
+    for(i=0; i<=360; i++){
+        test_color[0] = i;
+        if(make_darker && getLuminance(hslToRGB(test_color)) <= target_luminance){
             if(getRatio(target_luminance, getLuminance(hslToRGB(test_color))) < getRatio(target_luminance, getLuminance(hslToRGB(current_option)))){
                 current_option[0] = test_color[0];
+                recExists = true;
             }
-        } else if(!make_darker && getLuminance(hslToRGB(test_color)) > target_luminance){
+        } else if(!make_darker && getLuminance(hslToRGB(test_color)) >= target_luminance){
             if(getRatio(target_luminance, getLuminance(hslToRGB(test_color))) < getRatio(target_luminance, getLuminance(hslToRGB(current_option)))){
                 current_option[0] = test_color[0];
+                recExists = true;
             }
         }
     }
-    console.log("hue option: " + current_option);
-    hsl_options.push(current_option);
+    if(recExists){
+        console.log("hue option: " + current_option);
+        hsl_options.push(current_option);
+    } else {
+        console.log("no hue option");
+    }
     //Modify saturation
     var current_option = [...hsl_color];
     var test_color = [...hsl_color];
-    for(i=0; i<100; i++){
-        test_color[1] += i/100;
-        if(test_color[1] > 1){
-            test_color[1] -= 1;
-        }
-        if(make_darker && getLuminance(rgbToHSL(test_color)) < target_luminance){
+    var recExists = false;
+    test_color[1] = 0;
+    for(i=0; i<=100; i++){
+        test_color[1] = i;
+        if(make_darker && getLuminance(hslToRGB(test_color)) <= target_luminance){
             if(getRatio(target_luminance, getLuminance(hslToRGB(test_color))) < getRatio(target_luminance, getLuminance(hslToRGB(current_option)))){
                 current_option[1] = test_color[1];
+                recExists = true;
             }
-        } else if(!make_darker && getLuminance(hslToRGB(test_color)) > target_luminance){
+        } else if(!make_darker && getLuminance(hslToRGB(test_color)) >= target_luminance){
             if(getRatio(target_luminance, getLuminance(hslToRGB(test_color))) < getRatio(target_luminance, getLuminance(hslToRGB(current_option)))){
                 current_option[1] = test_color[1];
+                recExists = true;
             }
         }
     }
-    console.log("saturation option: " + current_option);
-    hsl_options.push(current_option);
-
+    if(recExists){
+        console.log("saturation option: " + current_option);
+        hsl_options.push(current_option);
+    } else {
+        console.log("no saturation option");
+    }
     //Modify lightness
     var current_option = [...hsl_color];
     var test_color = [...hsl_color];
-    for(i=0; i<100; i++){
-        test_color[2] += i/100;
-        if(test_color[2] > 1){
-            test_color[2] -= 1;
-        }
-        if(make_darker && getLuminance(rgbToHSL(test_color)) < target_luminance){
-            if(getRatio(target_luminance, getLuminance(rgbToHSL(test_color))) < getRatio(target_luminance, getLuminance(rgbToHSL(current_option)))){
+    var recExists = false;
+    test_color[2] = 0;
+    for(i=0; i<=100; i++){
+        test_color[2] = i;
+        console.log(test_color);
+        if(make_darker && getLuminance(hslToRGB(test_color)) <= target_luminance){
+            if(getRatio(target_luminance, getLuminance(hslToRGB(test_color))) < getRatio(target_luminance, getLuminance(hslToRGB(current_option)))){
                 current_option[2] = test_color[2];
+                recExists = true;
             }
-        } else if(!make_darker && getLuminance(rgbToHSL(test_color)) > target_luminance){
-            if(getRatio(target_luminance, getLuminance(rgbToHSL(test_color))) < getRatio(target_luminance, getLuminance(rgbToHSL(current_option)))){
+        } else if(!make_darker && getLuminance(hslToRGB(test_color)) >= target_luminance){
+            if(getRatio(target_luminance, getLuminance(hslToRGB(test_color))) < getRatio(target_luminance, getLuminance(hslToRGB(current_option)))){
                 current_option[2] = test_color[2];
+                recExists = true;
             }
         }
     }
-    hsl_options.push(current_option);
-    console.log("lightness option: " + current_option);
+    if(recExists){
+        console.log("lightness option: " + current_option);
+        hsl_options.push(current_option);
+    } else {
+        console.log("no lightness option");
+    }
     return hsl_options;
 }
 
-//Convert decimal HSL to degrees and percentages
-function machineHSLtoReadable(hsl) {
-    var h = Math.round(hsl[0] * 360);
-    var s = Math.round(hsl[1] * 100);
-    var l = Math.round(hsl[2] * 100);
-    return [h, s, l];
-}
-
-//Convert RGB to HSL
-function rgbToHSL(rgb){
-    var r = rgb[0]/255;
-    var g = rgb[1]/255;
-    var b = rgb[2]/255;
+//Convert RGB to HSL in degrees and percentages
+function rgbToHSL(rgb) {
+    var r = rgb[0] / 255;
+    var g = rgb[1] / 255;
+    var b = rgb[2] / 255;
     var max = Math.max(r, g, b);
     var min = Math.min(r, g, b);
     var h, s, l = (max + min) / 2;
     if(max == min){
-        h = s = 0;
-    }
-    else{
+        h = s = 0; // achromatic
+    } else {
         var d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         switch(max){
@@ -272,19 +333,18 @@ function rgbToHSL(rgb){
         }
         h /= 6;
     }
-    return [h, s, l];
+    return [h*360, s*100, l*100];
 }
 
-//Convert HSL to RGB
-function hslToRGB(hsl){
-    var h = hsl[0];
-    var s = hsl[1];
-    var l = hsl[2];
+//Convert HSL to RGB in degrees and percentages
+function hslToRGB(hsl) {
+    var h = hsl[0] / 360;
+    var s = hsl[1] / 100;
+    var l = hsl[2] / 100;
     var r, g, b;
     if(s == 0){
-        r = g = b = l;
-    }
-    else{
+        r = g = b = l; // achromatic
+    } else {
         var hue2rgb = function hue2rgb(p, q, t){
             if(t < 0) t += 1;
             if(t > 1) t -= 1;
@@ -299,5 +359,5 @@ function hslToRGB(hsl){
         g = hue2rgb(p, q, h);
         b = hue2rgb(p, q, h - 1/3);
     }
-    return [r * 255, g * 255, b * 255];
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
