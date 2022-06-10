@@ -1,22 +1,22 @@
 //Event handler for Two color recommender (from one given color)
-   function twoColorRec(){
-        console.log("clicked");
-        //get the value of the input fields
-        var r = Number($("#two-color-red").val());
-        var g = Number($("#two-color-green").val());
-        var b = Number($("#two-color-blue").val());
-        var ratio = $("#ratio").val();
-        colors = getSecondColor(chroma(r,g,b), ratio);
-        console.log(colors);
-        $("#two-color-result").empty();
-        $("#two-color-result").append("<p style=\"border-left: 18px solid rgb("+chroma(r,g,b).rgb()+")\" class='color-box'> Initial color: "+chroma(r,g,b).rgb()+"</p>");
-        colors.forEach(function(color){
-        $("#two-color-result").append("<p style=\"border-left: 18px solid rgb("+color.rgb()+")\" class='color-box'>"+color.rgb()+"</p>");
-        });
-    }
+function twoColorRec () {
+    console.log("clicked");
+    //get the value of the input fields
+    var r = Number($("#two-color-red").val());
+    var g = Number($("#two-color-green").val());
+    var b = Number($("#two-color-blue").val());
+    var ratio = $("#ratio").val();
+    colors = getSecondColor(chroma(r, g, b), ratio);
+    console.log(colors);
+    $("#two-color-result").empty();
+    $("#two-color-result").append("<p style=\"border-left: 18px solid rgb(" + chroma(r, g, b).rgb() + ")\" class='color-box'> Initial color: " + chroma(r, g, b).rgb() + "</p>");
+    colors.forEach(function (color) {
+        $("#two-color-result").append("<p style=\"border-left: 18px solid rgb(" + color.rgb() + ")\" class='color-box'>" + color.rgb() + "</p>");
+    });
+}
 
 //Event handler for two color recommender (from two given colors)
-function twoColorRecFromGivenColor(){
+function twoColorRecFromGivenColor () {
     //Get the value of the input fields
     var r1 = Number($("#two-color-stable-color-red").val());
     var g1 = Number($("#two-color-stable-color-green").val());
@@ -25,19 +25,19 @@ function twoColorRecFromGivenColor(){
     var g2 = Number($("#two-color-changeable-color-green").val());
     var b2 = Number($("#two-color-changeable-color-blue").val());
     var ratio = $("#ratio").val();
-    stable_color = chroma(r1,g1,b1);
-    changeable_color = chroma(r2,g2,b2);
+    stable_color = chroma(r1, g1, b1);
+    changeable_color = chroma(r2, g2, b2);
     colors = modifyColor(stable_color, changeable_color, ratio);
     console.log(colors);
     $("#two-color-result-from-given").empty();
-    $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb("+stable_color.rgb()+")\" class='color-box'> Initial color: "+stable_color.rgb()+"</p>");
-    $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb("+changeable_color.rgb()+")\" class='color-box'> Changed color: "+changeable_color.rgb()+"</p>");
-    colors.forEach(function(color){
-        $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb("+color.rgb()+")\" class='color-box'>"+color.rgb()+"</p>");
+    $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + stable_color.rgb() + ")\" class='color-box'> Initial color: " + stable_color.rgb() + "</p>");
+    $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + changeable_color.rgb() + ")\" class='color-box'> Changed color: " + changeable_color.rgb() + "</p>");
+    colors.forEach(function (color) {
+        $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + color.rgb() + ")\" class='color-box'>" + color.rgb() + "</p>");
     });
 }
 //Event handler for three color recommender (from two given colors)
-function threeColorRec(){
+function threeColorRec () {
     console.log("starting threeColorRec");
     //Get the value of the input fields
     var r_one = Number($("#three-color-one-red").val());
@@ -47,20 +47,20 @@ function threeColorRec(){
     var g_two = Number($("#three-color-two-green").val());
     var b_two = Number($("#three-color-two-blue").val());
     var ratio = Number($("#ratio").val());
-    color_one = chroma(r_one,g_one,b_one);
-    color_two = chroma(r_two,g_two,b_two);
+    color_one = chroma(r_one, g_one, b_one);
+    color_two = chroma(r_two, g_two, b_two);
     colors = getThirdColor(color_one, color_two, ratio);
     console.log(colors);
     $("#three-color-result").empty();
-    $("#three-color-result").append("<p style=\"border-left: 18px solid rgb("+color_one.rgb()+")\" class='color-box'> Stable color one: "+color_one.rgb()+"</p>");
-    $("#three-color-result").append("<p style=\"border-left: 18px solid rgb("+color_two.rgb()+")\" class='color-box'> Stable color two: "+color_two.rgb()+"</p>");
-    colors.forEach(function(color){
-        $("#three-color-result").append("<p style=\"border-left: 18px solid rgb("+color.rgb()+")\" class='color-box'>"+color.rgb()+"</p>");
+    $("#three-color-result").append("<p style=\"border-left: 18px solid rgb(" + color_one.rgb() + ")\" class='color-box'> Stable color one: " + color_one.rgb() + "</p>");
+    $("#three-color-result").append("<p style=\"border-left: 18px solid rgb(" + color_two.rgb() + ")\" class='color-box'> Stable color two: " + color_two.rgb() + "</p>");
+    colors.forEach(function (color) {
+        $("#three-color-result").append("<p style=\"border-left: 18px solid rgb(" + color.rgb() + ")\" class='color-box'>" + color.rgb() + "</p>");
     });
 }
 
 //Event handler for three color recommender (with two stable colors, modifying one)
-function threeColorRecFromGivenColor(){
+function threeColorRecFromGivenColor () {
     var r_stable_one = $("#three-color-stable-color-one-red").val();
     var g_stable_one = $("#three-color-stable-color-one-green").val();
     var b_stable_one = $("#three-color-stable-color-one-blue").val();
@@ -71,23 +71,23 @@ function threeColorRecFromGivenColor(){
     var g_change = $("#three-color-changeable-color-green").val();
     var b_change = $("#three-color-changeable-color-blue").val();
     var ratio = $("#ratio").val();
-    colors = modifyThreeColor([r_stable_one,g_stable_one,b_stable_one], [r_stable_two,g_stable_two,b_stable_two], [r_change,g_change,b_change], ratio);
+    colors = modifyThreeColor([r_stable_one, g_stable_one, b_stable_one], [r_stable_two, g_stable_two, b_stable_two], [r_change, g_change, b_change], ratio);
 }
 
 //Check contrast ratio compliance for two chroma colors
-function checkCompliant(change_color, stable_color, ratio){
-    return(chroma.contrast(change_color, stable_color) >= ratio ? true : false);
+function checkCompliant (change_color, stable_color, ratio) {
+    return (chroma.contrast(change_color, stable_color) >= ratio ? true : false);
 }
 
 //Produce a list of compliant options for a given color and ratio
-function getSecondColor(initial_color, ratio){
+function getSecondColor (initial_color, ratio) {
     //Get WCAG luminance for input color
     initial_lum = initial_color.luminance();
     //Find luminances that are compliant
     compliant_lum = secondLuminance(initial_lum, ratio);
     //Get a color for each of the compliant luminances
     colors = [];
-    compliant_lum.forEach(function(lum){
+    compliant_lum.forEach(function (lum) {
         var new_color = chroma("white").luminance(lum);
         new_color = tweak(new_color, initial_color, ratio, "rgb");
         colors.push(new_color);
@@ -95,7 +95,7 @@ function getSecondColor(initial_color, ratio){
     return colors;
 }
 
-function getThirdColor(color_one, color_two, ratio){
+function getThirdColor (color_one, color_two, ratio) {
     //Get WCAG luminance for input color
     color_one_lum = color_one.luminance();
     color_two_lum = color_two.luminance();
@@ -103,7 +103,7 @@ function getThirdColor(color_one, color_two, ratio){
     compliant_lum = thirdLuminance(color_one_lum, color_two_lum, ratio);
     //Get a color for each of the compliant luminances
     colors = [];
-    compliant_lum.forEach(function(lum){
+    compliant_lum.forEach(function (lum) {
         var new_color = chroma("white").luminance(lum);
         new_color = TwoWayTweak(new_color, color_one, color_two, ratio, "rgb");
         colors.push(new_color);
@@ -112,7 +112,7 @@ function getThirdColor(color_one, color_two, ratio){
 }
 
 //Modify an existing color to meet contrast with another color
-function modifyColor(initial_color, change_color, ratio){
+function modifyColor (initial_color, change_color, ratio) {
     //Get WCAG luminance for input color
     initial_lum = initial_color.luminance();
     //Find luminances that are compliant
@@ -120,7 +120,7 @@ function modifyColor(initial_color, change_color, ratio){
     console.log("compliant lums:" + compliant_lum);
     //Modify the new color to meet the requirements
     colors = [];
-    compliant_lum.forEach(function(lum){
+    compliant_lum.forEach(function (lum) {
         var new_color = chroma(change_color).luminance(lum);
         new_color = tweak(new_color, initial_color, ratio, "rgb");
         colors.push(new_color);
@@ -129,29 +129,29 @@ function modifyColor(initial_color, change_color, ratio){
 }
 
 //Tweak a color output of a given type be compliant with the ratio
-function tweak(change_color, stable_color, ratio, color_type){
-    for(i=0; i<5; i++){
-            //Round out the values to their human readable form
-            if(color_type == "rgb"){
-                change_color = change_color.rgb();
-                change_color = chroma(change_color);
-            }
-            //Check for compliance in human readable form
-            if(checkCompliant(change_color, stable_color, ratio)){
-                return(change_color);
-            }
+function tweak (change_color, stable_color, ratio, color_type) {
+    for (i = 0; i < 5; i++) {
+        //Round out the values to their human readable form
+        if (color_type == "rgb") {
+            change_color = change_color.rgb();
+            change_color = chroma(change_color);
+        }
+        //Check for compliance in human readable form
+        if (checkCompliant(change_color, stable_color, ratio)) {
+            return (change_color);
+        }
         //If it needs to be a little more luminous
-        if(change_color.luminance() > stable_color.luminance()){
+        if (change_color.luminance() > stable_color.luminance()) {
             //Try chromacity
             change_color = change_color.lch();
-            if(change_color[1] < 132){
+            if (change_color[1] < 132) {
                 change_color[1] += 1;
                 change_color = chroma(change_color, 'lch');
             }
 
             //Try lightness
             change_color = change_color.lch();
-            if(change_color[0] < 100){
+            if (change_color[0] < 100) {
                 change_color[0] += 1;
                 change_color = chroma(change_color, 'lch');
             }
@@ -159,7 +159,7 @@ function tweak(change_color, stable_color, ratio, color_type){
         } else { //If it needs to be a little less luminous
             //Try lightness
             change_color = change_color.lch();
-            if(change_color[0] > 0){
+            if (change_color[0] > 0) {
                 change_color[0] -= 1;
                 change_color = chroma(change_color, 'lch');
             }
@@ -168,31 +168,31 @@ function tweak(change_color, stable_color, ratio, color_type){
     }
 }
 
-function TwoWayTweak(change_color, stable_color_one, stable_color_two, ratio, color_type){
-    for(i=0; i<5; i++){
-            //Round out the values to their human readable form
-            if(color_type == "rgb"){
-                change_color = change_color.rgb();
-                change_color = chroma(change_color);
-            }
-            //Check for compliance in human readable form
-            if(checkCompliant(change_color, stable_color_one, ratio) && checkCompliant(change_color, stable_color_two, ratio)){
-                return(change_color);
-            }
-            //If the first color is the issue
-        if(checkCompliant(change_color, stable_color_one, ratio)){
+function TwoWayTweak (change_color, stable_color_one, stable_color_two, ratio, color_type) {
+    for (i = 0; i < 5; i++) {
+        //Round out the values to their human readable form
+        if (color_type == "rgb") {
+            change_color = change_color.rgb();
+            change_color = chroma(change_color);
+        }
+        //Check for compliance in human readable form
+        if (checkCompliant(change_color, stable_color_one, ratio) && checkCompliant(change_color, stable_color_two, ratio)) {
+            return (change_color);
+        }
+        //If the first color is the issue
+        if (checkCompliant(change_color, stable_color_one, ratio)) {
             //If it needs to be a little more luminous
-            if(change_color.luminance() > stable_color_two.luminance()){
+            if (change_color.luminance() > stable_color_two.luminance()) {
                 //Try chromacity
                 change_color = change_color.lch();
-                if(change_color[1] < 132){
+                if (change_color[1] < 132) {
                     change_color[1] += 1;
                     change_color = chroma(change_color, 'lch');
                 }
 
                 //Try lightness
                 change_color = change_color.lch();
-                if(change_color[0] < 100){
+                if (change_color[0] < 100) {
                     change_color[0] += 1;
                     change_color = chroma(change_color, 'lch');
                 }
@@ -200,25 +200,25 @@ function TwoWayTweak(change_color, stable_color_one, stable_color_two, ratio, co
             } else { //If the second color is the issue
                 //Try lightness
                 change_color = change_color.lch();
-                if(change_color[0] > 0){
+                if (change_color[0] > 0) {
                     change_color[0] -= 1;
                     change_color = chroma(change_color, 'lch');
                 }
 
             }
-        } else { 
+        } else {
             //If it needs to be a little more luminous
-            if(change_color.luminance() > stable_color_one.luminance()){
+            if (change_color.luminance() > stable_color_one.luminance()) {
                 //Try chromacity
                 change_color = change_color.lch();
-                if(change_color[1] < 132){
+                if (change_color[1] < 132) {
                     change_color[1] += 1;
                     change_color = chroma(change_color, 'lch');
                 }
 
                 //Try lightness
                 change_color = change_color.lch();
-                if(change_color[0] < 100){
+                if (change_color[0] < 100) {
                     change_color[0] += 1;
                     change_color = chroma(change_color, 'lch');
                 }
@@ -226,78 +226,78 @@ function TwoWayTweak(change_color, stable_color_one, stable_color_two, ratio, co
             } else { //If the second color is the issue
                 //Try lightness
                 change_color = change_color.lch();
-                if(change_color[0] > 0){
+                if (change_color[0] > 0) {
                     change_color[0] -= 1;
                     change_color = chroma(change_color, 'lch');
                 }
 
-            }        
+            }
         }
     }
-    return("No good tweak");
+    return ("No good tweak");
 }
 
 //Calculate compliant luminance above and below input luminance for a given ratio
-function secondLuminance(oldLuminance, desired_ratio) {
+function secondLuminance (oldLuminance, desired_ratio) {
     options = [];
-    darkOption = (oldLuminance + 0.05)/desired_ratio - 0.05;
-    if(darkOption > 0 && darkOption < 1){
+    darkOption = (oldLuminance + 0.05) / desired_ratio - 0.05;
+    if (darkOption > 0 && darkOption < 1) {
         options.push(darkOption);
     }
-    lightOption = desired_ratio*(oldLuminance + 0.05) - 0.05;
-    if(lightOption > 0 && lightOption < 1){
+    lightOption = desired_ratio * (oldLuminance + 0.05) - 0.05;
+    if (lightOption > 0 && lightOption < 1) {
         options.push(lightOption);
     }
-    return(options);
+    return (options);
 }
 
 //Calculate compliant luminance for two other luminances (which don't necessarily contrast) at a given ratio
-function thirdLuminance(first_luminance, second_luminance, desired_ratio){
+function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
     var brightest = Math.max(first_luminance, second_luminance);
     var darkest = Math.min(first_luminance, second_luminance);
     var options = [];
     //Middle
-    if(getRatio(darkest, brightest) > desired_ratio){
+    if (getRatio(darkest, brightest) > desired_ratio) {
         middle_option_one = secondLuminance(darkest, desired_ratio)[0];
         middle_option_two = secondLuminance(brightest, desired_ratio)[0];
-        if(getRatio(middle_option_one, brightest) >= desired_ratio){
+        if (getRatio(middle_option_one, brightest) >= desired_ratio) {
             options.push(middle_option_one);
             console.log("middle option one: " + middle_option_one);
         }
-        if(getRatio(middle_option_two, darkest) >= desired_ratio){
+        if (getRatio(middle_option_two, darkest) >= desired_ratio) {
             options.push(middle_option_two);
             console.log("middle option two: " + middle_option_two);
         }
-        if((getRatio(middle_option_two, darkest) >= desired_ratio) && (getRatio(middle_option_one, brightest) >= desired_ratio)){
-            true_middle = (middle_option_one + middle_option_two)/2;
+        if ((getRatio(middle_option_two, darkest) >= desired_ratio) && (getRatio(middle_option_one, brightest) >= desired_ratio)) {
+            true_middle = (middle_option_one + middle_option_two) / 2;
             options.push(true_middle);
             console.log("true middle: " + true_middle);
         }
     }
 
     //Lower
-    lower_option = (darkest + 0.05)/desired_ratio - 0.05;
-    if(lower_option > 0 && lower_option < 1){
+    lower_option = (darkest + 0.05) / desired_ratio - 0.05;
+    if (lower_option > 0 && lower_option < 1) {
         options.push(lower_option);
         console.log("lower option: " + darkOption);
     }
 
     //Higher
-    higher_option = desired_ratio*(brightest + 0.05) - 0.05;
-    if(higher_option > 0 && higher_option < 1){
+    higher_option = desired_ratio * (brightest + 0.05) - 0.05;
+    if (higher_option > 0 && higher_option < 1) {
         options.push(higher_option);
     }
     higher_option = secondLuminance(brightest, desired_ratio)[1];
-    if(higher_option <=1){
+    if (higher_option <= 1) {
         options.push(higher_option);
         console.log("higher option: " + higher_option);
     }
-    return(options);
+    return (options);
 }
 
 
 //Gets contrast ratio between two relative luminosities
-function getRatio(lum1, lum2){
+function getRatio (lum1, lum2) {
     var brightest = Math.max(lum1, lum2);
     var darkest = Math.min(lum1, lum2);
     return (brightest + 0.05) / (darkest + 0.05);
@@ -324,7 +324,7 @@ function getRatio(lum1, lum2){
 //     for(var i = 0; i < linear.length; i++){
 //         if(linear[i] <= 0.003035269835488375){
 //             srgb[i] = Math.round(255*(linear[i] * 12.92));
-//         } 
+//         }
 //         else{
 //             srgb[i] = Math.round((255*(Math.pow(linear[i], 1/2.4)*1.055 - 0.055)));
 //         }
