@@ -1,115 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <script
-      src="https://code.jquery.com/jquery-3.6.0.js"
-      integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
-      integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script src="contrastchecker.js"></script>
-  </head>
-  <body>
-    <h1>Contrast recommender</h1>
-    <label for="ratio">Ratio</label>
-    <input id="ratio" type="text" />
 
-    <h2>Two color recommender (from one given color)</h2>
-    <h3>Color</h3>
-    <label for="two-color-red">Red</label>
-    <input type="text" id="two-color-red" />
-    <label for="two-color-green">Green</label>
-    <input type="text" id="two-color-green" />
-    <label for="two-color-blue">Blue</label>
-    <input type="text" id="two-color-blue" />
-    <button onclick="twoColorRec()" id="two-color-rec">
-      Get recommendations
-    </button>
-    <div id="two-color-result"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <script src="contrastchecker.js"></script>
+</head>
 
-    <h2>Two color recommender (from a given color)</h2>
-    <h3>Stable color</h3>
-    <label for="two-color-stable-color-red">Red</label>
-    <input type="text" id="two-color-stable-color-red" />
-    <label for="two-color-stable-color-green">Green</label>
-    <input type="text" id="two-color-stable-color-green" />
-    <label for="two-color-stable-color-blue">Blue</label>
-    <input type="text" id="two-color-stable-color-blue" />
-    <h3>Changeable color</h3>
-    <label for="two-color-changeable-color-red">Red</label>
-    <input type="text" id="two-color-changeable-color-red" />
-    <label for="two-color-changeable-color-green">Green</label>
-    <input type="text" id="two-color-changeable-color-green" />
-    <label for="two-color-changeable-color-blue">Blue</label>
-    <input type="text" id="two-color-changeable-color-blue" />
-    <button
-      onclick="twoColorRecFromGivenColor()"
-      id="two-color-rec-from-given-color"
-    >
-      Get recommendations
-    </button>
-    <div id="two-color-result-from-given"></div>
+<body>
+  <h1>Contrast recommender</h1>
+  <label for="ratio">Ratio</label>
+  <input id="ratio" type="text" />
 
-    <h2>Three color recommender (from one given color)</h2>
+  <h2>Two color recommender (from one given color)</h2>
+  <h3>Color</h3>
+  <label for="two-color-red">Red</label>
+  <input type="text" id="two-color-red" />
+  <label for="two-color-green">Green</label>
+  <input type="text" id="two-color-green" />
+  <label for="two-color-blue">Blue</label>
+  <input type="text" id="two-color-blue" />
+  <button onclick="ContrastChecker.twoColorRec()" id="two-color-rec">
+    Get recommendations
+  </button>
+  <div id="two-color-result"></div>
 
-    <h2>Three color recommender (from two colors)</h2>
-    <h3>Color one</h3>
-    <label for="three-color-one-red">Red</label>
-    <input type="text" id="three-color-one-red" />
-    <label for="three-color-one-green">Green</label>
-    <input type="text" id="three-color-one-green" />
-    <label for="three-color-one-blue">Blue</label>
-    <input type="text" id="three-color-one-blue" />
-    <h3>Color two</h3>
-    <label for="three-color-two-red">Red</label>
-    <input type="text" id="three-color-two-red" />
-    <label for="three-color-two-green">Green</label>
-    <input type="text" id="three-color-two-green" />
-    <label for="three-color-two-blue">Blue</label>
-    <input type="text" id="three-color-two-blue" />
-    <button onclick="threeColorRec()" id="three-color-rec">
-      Get recommendations
-    </button>
-    <div id="three-color-result"></div>
+  <h2>Two color recommender (from a given color)</h2>
+  <h3>Stable color</h3>
+  <label for="two-color-stable-color-red">Red</label>
+  <input type="text" id="two-color-stable-color-red" />
+  <label for="two-color-stable-color-green">Green</label>
+  <input type="text" id="two-color-stable-color-green" />
+  <label for="two-color-stable-color-blue">Blue</label>
+  <input type="text" id="two-color-stable-color-blue" />
+  <h3>Changeable color</h3>
+  <label for="two-color-changeable-color-red">Red</label>
+  <input type="text" id="two-color-changeable-color-red" />
+  <label for="two-color-changeable-color-green">Green</label>
+  <input type="text" id="two-color-changeable-color-green" />
+  <label for="two-color-changeable-color-blue">Blue</label>
+  <input type="text" id="two-color-changeable-color-blue" />
+  <button onclick="ContrastChecker.twoColorRecFromGivenColor()" id="two-color-rec-from-given-color">
+    Get recommendations
+  </button>
+  <div id="two-color-result-from-given"></div>
 
-    <h2>Three color recommender, two stable, one changeable</h2>
-    <h3>Stable color one</h3>
-    <label for="three-color-stable-color-one-red">Red</label>
-    <input type="text" id="three-color-stable-color-one-red" />
-    <label for="three-color-stable-color-one-green">Green</label>
-    <input type="text" id="three-color-stable-color-one-green" />
-    <label for="three-color-stable-color-one-blue">Blue</label>
-    <input type="text" id="three-color-stable-color-one-blue" />
-    <h3>Stable color two</h3>
-    <label for="three-color-stable-color-two-red">Red</label>
-    <input type="text" id="three-color-stable-color-two-red" />
-    <label for="three-color-stable-color-two-green">Green</label>
-    <input type="text" id="three-color-stable-color-two-green" />
-    <label for="three-color-stable-color-two-blue">Blue</label>
-    <input type="text" id="three-color-stable-color-two-blue" />
-    <h3>Changeable color</h3>
-    <label for="three-color-changeable-color-red">Red</label>
-    <input type="text" id="three-color-changeable-color-red" />
-    <label for="three-color-changeable-color-green">Green</label>
-    <input type="text" id="three-color-changeable-color-green" />
-    <label for="three-color-changeable-color-blue">Blue</label>
-    <input type="text" id="three-color-changeable-color-blue" />
-    <button
-      onclick="threeColorRecFromGivenColor()"
-      id="three-color-rec-from-given-color"
-    >
-      Get recommendations
-    </button>
+  <h2>Three color recommender (from one given color)</h2>
 
-    <h2>Three color recommender, one stable, two changeable</h2>
-  </body>
+  <h2>Three color recommender (from two colors)</h2>
+  <h3>Color one</h3>
+  <label for="three-color-one-red">Red</label>
+  <input type="text" id="three-color-one-red" />
+  <label for="three-color-one-green">Green</label>
+  <input type="text" id="three-color-one-green" />
+  <label for="three-color-one-blue">Blue</label>
+  <input type="text" id="three-color-one-blue" />
+  <h3>Color two</h3>
+  <label for="three-color-two-red">Red</label>
+  <input type="text" id="three-color-two-red" />
+  <label for="three-color-two-green">Green</label>
+  <input type="text" id="three-color-two-green" />
+  <label for="three-color-two-blue">Blue</label>
+  <input type="text" id="three-color-two-blue" />
+  <button onclick="ContrastChecker.threeColorRec()" id="three-color-rec">
+    Get recommendations
+  </button>
+  <div id="three-color-result"></div>
+
+  <h2>Three color recommender, two stable, one changeable</h2>
+  <h3>Stable color one</h3>
+  <label for="three-color-stable-color-one-red">Red</label>
+  <input type="text" id="three-color-stable-color-one-red" />
+  <label for="three-color-stable-color-one-green">Green</label>
+  <input type="text" id="three-color-stable-color-one-green" />
+  <label for="three-color-stable-color-one-blue">Blue</label>
+  <input type="text" id="three-color-stable-color-one-blue" />
+  <h3>Stable color two</h3>
+  <label for="three-color-stable-color-two-red">Red</label>
+  <input type="text" id="three-color-stable-color-two-red" />
+  <label for="three-color-stable-color-two-green">Green</label>
+  <input type="text" id="three-color-stable-color-two-green" />
+  <label for="three-color-stable-color-two-blue">Blue</label>
+  <input type="text" id="three-color-stable-color-two-blue" />
+  <h3>Changeable color</h3>
+  <label for="three-color-changeable-color-red">Red</label>
+  <input type="text" id="three-color-changeable-color-red" />
+  <label for="three-color-changeable-color-green">Green</label>
+  <input type="text" id="three-color-changeable-color-green" />
+  <label for="three-color-changeable-color-blue">Blue</label>
+  <input type="text" id="three-color-changeable-color-blue" />
+  <button onclick="ContrastChecker.threeColorRecFromGivenColor()" id="three-color-rec-from-given-color">
+    Get recommendations
+  </button>
+
+  <h2>Three color recommender, one stable, two changeable</h2>
+</body>
+
 </html>
