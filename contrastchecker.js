@@ -47,7 +47,9 @@ function threeColorRec(){
     var g_two = $("#three-color-two-green").val();
     var b_two = $("#three-color-two-blue").val();
     var ratio = $("#ratio").val();
-    colors = getThirdColor([r_one,g_one,b_one], [r_two,g_two,b_two], ratio);
+    color_one = chroma(r_one,g_one,b_one);
+    color_two = chroma(r_two,g_two,b_two);
+    colors = getThirdColor(color_one, color_two, ratio);
     $("#three-color-result").empty();
     colors.forEach(function(color){
         color.forEach(function(color){
@@ -92,6 +94,22 @@ function getSecondColor(initial_color, ratio){
     return colors;
 }
 
+function getThirdColor(color_one, color_two, ratio){
+    //Get WCAG luminance for input color
+    color_one_lum = color_one.luminance();
+    color_two_lum = color_two.luminance();
+    //Find luminances that are compliant
+    compliant_lum = thirdLuminance(color_one_lum, color_two_lum, ratio);
+    //Get a color for each of the compliant luminances
+    colors = [];
+    compliant_lum.forEach(function(lum){
+        var new_color = chroma("white").luminance(lum);
+        new_color = TwoWayTweak(new_color, color_one, color_two, ratio, "rgb");
+        colors.push(new_color);
+    });
+    return colors;
+}
+
 //Modify an existing color to meet contrast with another color
 function modifyColor(initial_color, change_color, ratio){
     //Get WCAG luminance for input color
@@ -108,22 +126,6 @@ function modifyColor(initial_color, change_color, ratio){
     });
     return colors;
 }
-
-
-//Calculate compliant luminance above and below input luminance for a given ratio
-function secondLuminance(oldLuminance, desired_ratio) {
-    options = [];
-    darkOption = (oldLuminance + 0.05)/desired_ratio - 0.05;
-    if(darkOption > 0 && darkOption < 1){
-        options.push(darkOption);
-    }
-    lightOption = desired_ratio*(oldLuminance + 0.05) - 0.05;
-    if(lightOption > 0 && lightOption < 1){
-        options.push(lightOption);
-    }
-    return(options);
-}
-
 
 //Tweak a color output of a given type be compliant with the ratio
 function tweak(change_color, stable_color, ratio, color_type){
@@ -165,17 +167,71 @@ function tweak(change_color, stable_color, ratio, color_type){
     }
 }
 
+function TwoWayTweak(change_color, stable_color_one, stable_color_two, ratio, color_type){
+    for(i=0; i<5; i++){
+            //Round out the values to their human readable form
+            if(color_type == "rgb"){
+                change_color = change_color.rgb();
+                change_color = chroma(change_color);
+            }
+            //Check for compliance in human readable form
+            if(checkCompliant(change_color, stable_color_one, ratio) && checkCompliant(change_color, stable_color_two, ratio)){
+                return(change_color);
+            }
+            //If the first color is the issue
+        if(checkCompliant(change_color, stable_color_one, ratio)){
+            //If it needs to be a little more luminous
+            if(change_color.luminance() > stable_color_one.luminance()){
+                //Try chromacity
+                change_color = change_color.lch();
+                if(change_color[1] < 132){
+                    change_color[1] += 1;
+                    change_color = chroma(change_color, 'lch');
+                }
+
+                //Try lightness
+                change_color = change_color.lch();
+                if(change_color[0] < 100){
+                    change_color[0] += 1;
+                    change_color = chroma(change_color, 'lch');
+                }
+
+            } else { //If the second color is the issue
+                //Try lightness
+                change_color = change_color.lch();
+                if(change_color[0] > 0){
+                    change_color[0] -= 1;
+                    change_color = chroma(change_color, 'lch');
+                }
+
+            }
+        } else { 
+        //If it needs to be a little more luminous
+    }
+}
+
+//Calculate compliant luminance above and below input luminance for a given ratio
+function secondLuminance(oldLuminance, desired_ratio) {
+    options = [];
+    darkOption = (oldLuminance + 0.05)/desired_ratio - 0.05;
+    if(darkOption > 0 && darkOption < 1){
+        options.push(darkOption);
+    }
+    lightOption = desired_ratio*(oldLuminance + 0.05) - 0.05;
+    if(lightOption > 0 && lightOption < 1){
+        options.push(lightOption);
+    }
+    return(options);
+}
+
+
+
+
 // //Gets contrast ratio between two relative luminosities
 // function getRatio(lum1, lum2){
 //     var brightest = Math.max(lum1, lum2);
 //     var darkest = Math.min(lum1, lum2);
 //     return (brightest + 0.05) / (darkest + 0.05);
-// }
-
-// //Calculate relative luminance from RGB values
-// function getLuminance(RGB){
-//     linear = RGBtoLinear(RGB);
-//     return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
 // }
 
 // // Calculate linear RBG from sRGB values
@@ -209,45 +265,45 @@ function tweak(change_color, stable_color, ratio, color_type){
 
 
 
-// //Calculate compliant luminance for two other luminances (which don't necessarily contrast) at a given ratio
-// function thirdLuminance(first_luminance, second_luminance, desired_ratio){
-//     var brightest = Math.max(first_luminance, second_luminance);
-//     var darkest = Math.min(first_luminance, second_luminance);
-//     var options = [];
-//     //Middle
-//     if(getRatio(darkest, brightest) > desired_ratio){
-//         middle_option_one = secondLuminance(darkest, desired_ratio)[1];
-//         middle_option_two = secondLuminance(brightest, desired_ratio)[0];
-//         if(getRatio(middle_option_one, brightest) >= desired_ratio){
-//             options.push(middle_option_one);
-//             console.log("middle option one: " + middle_option_one);
-//         }
-//         if(getRatio(middle_option_two, darkest) >= desired_ratio){
-//             options.push(middle_option_two);
-//             console.log("middle option two: " + middle_option_two);
-//         }
-//         if((getRatio(middle_option_two, darkest) >= desired_ratio) && (getRatio(middle_option_one, brightest) >= desired_ratio)){
-//             true_middle = (middle_option_one + middle_option_two)/2;
-//             options.push(true_middle);
-//             console.log("true middle: " + true_middle);
-//         }
-//     }
+//Calculate compliant luminance for two other luminances (which don't necessarily contrast) at a given ratio
+function thirdLuminance(first_luminance, second_luminance, desired_ratio){
+    var brightest = Math.max(first_luminance, second_luminance);
+    var darkest = Math.min(first_luminance, second_luminance);
+    var options = [];
+    //Middle
+    if(getRatio(darkest, brightest) > desired_ratio){
+        middle_option_one = secondLuminance(darkest, desired_ratio)[1];
+        middle_option_two = secondLuminance(brightest, desired_ratio)[0];
+        if(getRatio(middle_option_one, brightest) >= desired_ratio){
+            options.push(middle_option_one);
+            console.log("middle option one: " + middle_option_one);
+        }
+        if(getRatio(middle_option_two, darkest) >= desired_ratio){
+            options.push(middle_option_two);
+            console.log("middle option two: " + middle_option_two);
+        }
+        if((getRatio(middle_option_two, darkest) >= desired_ratio) && (getRatio(middle_option_one, brightest) >= desired_ratio)){
+            true_middle = (middle_option_one + middle_option_two)/2;
+            options.push(true_middle);
+            console.log("true middle: " + true_middle);
+        }
+    }
 
-//     //Lower
-//     lower_option = secondLuminance(darkest, desired_ratio)[0];
-//     if(lower_option >=0){
-//         options.push(lower_option);
-//         console.log("lower option: " + lower_option);
-//     }
+    //Lower
+    lower_option = secondLuminance(darkest, desired_ratio)[0];
+    if(lower_option >=0){
+        options.push(lower_option);
+        console.log("lower option: " + lower_option);
+    }
 
-//     //Higher
-//     higher_option = secondLuminance(brightest, desired_ratio)[1];
-//     if(higher_option <=1){
-//     options.push(higher_option);
-//     console.log("higher option: " + higher_option);
-//     }
-//     return(options);
-// }
+    //Higher
+    higher_option = secondLuminance(brightest, desired_ratio)[1];
+    if(higher_option <=1){
+    options.push(higher_option);
+    console.log("higher option: " + higher_option);
+    }
+    return(options);
+}
 
 // //Return a set of colors which are complient with the supplied color
 // function getSecondColor(rgb, desired_ratio){
