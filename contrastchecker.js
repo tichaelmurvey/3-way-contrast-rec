@@ -1,6 +1,5 @@
-//Event handler for Two color recommender (from one given color)
+//Event handler for two colour recommender (from one given color)
 function twoColorRec () {
-    console.log("clicked");
     //get the value of the input fields
     var r = Number($("#two-color-red").val());
     var g = Number($("#two-color-green").val());
@@ -10,12 +9,10 @@ function twoColorRec () {
     console.log(colors);
     $("#two-color-result").empty();
     $("#two-color-result").append("<p style=\"border-left: 18px solid rgb(" + chroma(r, g, b).rgb() + ")\" class='color-box'> Initial color: " + chroma(r, g, b).rgb() + "</p>");
-    colors.forEach(function (color) {
-        $("#two-color-result").append("<p style=\"border-left: 18px solid rgb(" + color.rgb() + ")\" class='color-box'>" + color.rgb() + "</p>");
-    });
+    printResults(colors, $("#two-color-result"));
 }
 
-//Event handler for two color recommender (from two given colors)
+//Event handler for two colour recommender (from two given colors)
 function twoColorRecFromGivenColor () {
     //Get the value of the input fields
     var r1 = Number($("#two-color-stable-color-red").val());
@@ -32,9 +29,7 @@ function twoColorRecFromGivenColor () {
     $("#two-color-result-from-given").empty();
     $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + stable_color.rgb() + ")\" class='color-box'> Initial color: " + stable_color.rgb() + "</p>");
     $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + changeable_color.rgb() + ")\" class='color-box'> Changed color: " + changeable_color.rgb() + "</p>");
-    colors.forEach(function (color) {
-        $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + color.rgb() + ")\" class='color-box'>" + color.rgb() + "</p>");
-    });
+    printResults(colors, $("#two-color-result-from-given"));
 }
 //Event handler for three color recommender (from two given colors)
 function threeColorRec () {
@@ -54,24 +49,35 @@ function threeColorRec () {
     $("#three-color-result").empty();
     $("#three-color-result").append("<p style=\"border-left: 18px solid rgb(" + color_one.rgb() + ")\" class='color-box'> Stable color one: " + color_one.rgb() + "</p>");
     $("#three-color-result").append("<p style=\"border-left: 18px solid rgb(" + color_two.rgb() + ")\" class='color-box'> Stable color two: " + color_two.rgb() + "</p>");
-    colors.forEach(function (color) {
-        $("#three-color-result").append("<p style=\"border-left: 18px solid rgb(" + color.rgb() + ")\" class='color-box'>" + color.rgb() + "</p>");
-    });
+    printResults(colors, $("#three-color-result"));
 }
 
 //Event handler for three color recommender (with two stable colors, modifying one)
 function threeColorRecFromGivenColor () {
-    var r_stable_one = $("#three-color-stable-color-one-red").val();
+    var r_stable_one = Number($("#three-color-stable-color-one-red").val());
     var g_stable_one = $("#three-color-stable-color-one-green").val();
-    var b_stable_one = $("#three-color-stable-color-one-blue").val();
-    var r_stable_two = $("#three-color-stable-color-two-red").val();
-    var g_stable_two = $("#three-color-stable-color-two-green").val();
-    var b_stable_two = $("#three-color-stable-color-two-blue").val();
-    var r_change = $("#three-color-changeable-color-red").val();
-    var g_change = $("#three-color-changeable-color-green").val();
-    var b_change = $("#three-color-changeable-color-blue").val();
+    var b_stable_one = Number($("#three-color-stable-color-one-blue").val());
+    var r_stable_two = Number($("#three-color-stable-color-two-red").val());
+    var g_stable_two = Number($("#three-color-stable-color-two-green").val());
+    var b_stable_two = Number($("#three-color-stable-color-two-blue").val());
+    var r_change = Number($("#three-color-changeable-color-red").val());
+    var g_change = Number($("#three-color-changeable-color-green").val());
+    var b_change = Number($("#three-color-changeable-color-blue").val());
     var ratio = $("#ratio").val();
-    colors = modifyThreeColor([r_stable_one, g_stable_one, b_stable_one], [r_stable_two, g_stable_two, b_stable_two], [r_change, g_change, b_change], ratio);
+    color_one = chroma(r_stable_one, g_stable_one, b_stable_one);
+    color_two = chroma(r_stable_two, g_stable_two, b_stable_two);
+    color_three = chroma(r_change, g_change, b_change)
+    colors = modifyThreeColor(color_one, color_two, color_three, ratio);
+}
+
+function printResults (colors, results_container) {
+    if(colors === "compliant"){
+        results_container.append("<p>Already compliant</p>");
+    } else {
+        colors.forEach(function (color) {
+            results_container.append("<p style=\"border-left: 18px solid rgb(" + color[1].rgb() + ")\" class='color-box'>" + color[1].rgb() + " "+color[0] + "</p>");
+        });
+    }
 }
 
 //Check contrast ratio compliance for two chroma colors
@@ -84,14 +90,17 @@ function getSecondColor (initial_color, ratio) {
     //Get WCAG luminance for input color
     initial_lum = initial_color.luminance();
     //Find luminances that are compliant
-    compliant_lum = secondLuminance(initial_lum, ratio);
+    compliant_lums = secondLuminance(initial_lum, ratio);
+    console.log(compliant_lums);
     //Get a color for each of the compliant luminances
     colors = [];
-    compliant_lum.forEach(function (lum) {
-        var new_color = chroma("white").luminance(lum);
-        new_color = tweak(new_color, initial_color, ratio, "rgb");
-        colors.push(new_color);
-    });
+    for (var lum in compliant_lums) {
+        if(compliant_lums[lum]) {
+            var new_color = chroma("white").luminance(compliant_lums[lum]);
+            new_color = tweak(new_color, initial_color, ratio, "rgb");
+            colors.push(["greyscale",new_color]);
+        }
+    }
     return colors;
 }
 
@@ -106,24 +115,88 @@ function getThirdColor (color_one, color_two, ratio) {
     compliant_lum.forEach(function (lum) {
         var new_color = chroma("white").luminance(lum);
         new_color = TwoWayTweak(new_color, color_one, color_two, ratio, "rgb");
-        colors.push(new_color);
+        colors.push(["Grayscale", new_color]);
     });
     return colors;
 }
 
 //Modify an existing color to meet contrast with another color
 function modifyColor (initial_color, change_color, ratio) {
+    //Check whether ratio is compliant already
+    if(chroma.contrast(initial_color, change_color) >= ratio){
+        return "compliant";
+    }
     //Get WCAG luminance for input color
     initial_lum = initial_color.luminance();
     //Find luminances that are compliant
-    compliant_lum = secondLuminance(initial_lum, ratio);
+    compliant_lums = secondLuminance(initial_lum, ratio);
     console.log("compliant lums:" + compliant_lum);
     //Modify the new color to meet the requirements
-    colors = [];
-    compliant_lum.forEach(function (lum) {
-        var new_color = chroma(change_color).luminance(lum);
-        new_color = tweak(new_color, initial_color, ratio, "rgb");
-        colors.push(new_color);
+    return adjustColor(change_color, compliant_lums, initial_lum, ratio);
+}
+
+function modifyThreeColor (color_one, color_two, change_color, ratio) {
+    if(chroma.contrast(color_one, change_color) >= ratio && chroma.contrast(color_two, change_color) >= ratio ){
+        return "compliant";
+    }
+    //Get WCAG luminance for input color
+    color_one_lum = color_one.luminance();
+    color_two_lum = color_two.luminance();
+    //Find luminances that are compliant
+    compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
+    //Get a color for each of the compliant luminances
+    return adjustThreeColor(change_color, compliant_lums, initial_lum, ratio);
+}
+
+function adjustColor (initial_color, compliant_lums, initial_lum, ratio) {
+    var colors = [];
+    //Basic white interpolation option
+    for (var lum in compliant_lums) {
+        if(compliant_lums[lum]) {
+            var new_color = chroma(initial_color).luminance(compliant_lums[lum]);
+            new_color = tweak(new_color, initial_color, ratio, "rgb");
+            colors.push(["interpolation",new_color]);
+        }
+    }
+    //lch Option retaining chroma and hue
+
+    //Simple light or dark
+    for (var lumtype in compliant_lums) {
+        if(compliant_lums[lumtype]) {
+            if(lumtype === 'darkOption' || lumtype === 'underBoth'){
+                //Find something lower than
+            }
+            if(lumtype === 'lightOption' || lumtype === 'aboveBoth'){
+                //find something higher than
+            }
+        }
+    }
+    //Middle options
+    if(compliant_lums.trueMiddle){
+        //Something close to the true middle
+    }
+    
+    if(compliant_lums.middleDarker){
+        //close to darker without going under
+    }
+
+    if(compliant_lums.middleLighter){
+        //close to lighter without going over
+    }
+
+    compliant_lums.forEach(function (lum) {
+        if(lum > initial_lum){
+            new_color = adjustLightnessUp(initial_color, lum);
+            if(new_color != "no color found"){
+                colors.push(['lch lightness adjustment', new_color]);
+            }
+        }
+        else {
+            new_color = adjustLightnessDown(change_color, lum);
+            if(new_color != "no color found"){
+                colors.push(['lch lightness adjustment', new_color]);
+            }
+        }
     });
     return colors;
 }
@@ -239,14 +312,17 @@ function TwoWayTweak (change_color, stable_color_one, stable_color_two, ratio, c
 
 //Calculate compliant luminance above and below input luminance for a given ratio
 function secondLuminance (oldLuminance, desired_ratio) {
-    options = [];
+    let options = {
+        darkOption: null,
+        lightOption: null
+    };
     darkOption = (oldLuminance + 0.05) / desired_ratio - 0.05;
     if (darkOption > 0 && darkOption < 1) {
-        options.push(darkOption);
+        options.darkOption = darkOption;
     }
     lightOption = desired_ratio * (oldLuminance + 0.05) - 0.05;
     if (lightOption > 0 && lightOption < 1) {
-        options.push(lightOption);
+        options.lightOption = lightOption;
     }
     return (options);
 }
@@ -255,41 +331,43 @@ function secondLuminance (oldLuminance, desired_ratio) {
 function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
     var brightest = Math.max(first_luminance, second_luminance);
     var darkest = Math.min(first_luminance, second_luminance);
-    var options = [];
+    let options = {
+        underBoth: null,
+        aboveBoth: null,
+        middleDarker: null,
+        trueMiddle: null,
+        middleLighter: null
+    };
     //Middle
     if (getRatio(darkest, brightest) > desired_ratio) {
-        middle_option_one = secondLuminance(darkest, desired_ratio)[0];
-        middle_option_two = secondLuminance(brightest, desired_ratio)[0];
-        if (getRatio(middle_option_one, brightest) >= desired_ratio) {
-            options.push(middle_option_one);
-            console.log("middle option one: " + middle_option_one);
+        middleDarker = secondLuminance(darkest, desired_ratio).lightOption;
+        middleLighter = secondLuminance(brightest, desired_ratio).darkOption;
+        trueMiddle = (middleDarker + middleLighter) / 2;
+        if (getRatio(middleDarker, brightest) >= desired_ratio) {
+            options.middleDarker = middleDarker;
+            console.log("Darker middle: " + middleDarker);
         }
-        if (getRatio(middle_option_two, darkest) >= desired_ratio) {
-            options.push(middle_option_two);
-            console.log("middle option two: " + middle_option_two);
+        if (getRatio(middleLighter, darkest) >= desired_ratio) {
+            options.middleLighter = middleLighter;
+            console.log("Lighter middle option: " + middleLighter);
         }
-        if ((getRatio(middle_option_two, darkest) >= desired_ratio) && (getRatio(middle_option_one, brightest) >= desired_ratio)) {
-            true_middle = (middle_option_one + middle_option_two) / 2;
-            options.push(true_middle);
-            console.log("true middle: " + true_middle);
+        if ((getRatio(trueMiddle, darkest) >= desired_ratio) && (getRatio(trueMiddle, brightest) >= desired_ratio)) {
+            options.trueMiddle = trueMiddle;
+            console.log("true middle: " + trueMiddle);
         }
     }
 
     //Lower
-    lower_option = (darkest + 0.05) / desired_ratio - 0.05;
+    lower_option = secondLuminance(darkest, desired_ratio).darkOption;
     if (lower_option > 0 && lower_option < 1) {
-        options.push(lower_option);
-        console.log("lower option: " + darkOption);
+        options.underBoth = lower_option;
+        console.log("lower option: " + lower_option);
     }
 
     //Higher
-    higher_option = desired_ratio * (brightest + 0.05) - 0.05;
-    if (higher_option > 0 && higher_option < 1) {
-        options.push(higher_option);
-    }
-    higher_option = secondLuminance(brightest, desired_ratio)[1];
+    higher_option = secondLuminance(brightest, desired_ratio).lightOption;
     if (higher_option <= 1) {
-        options.push(higher_option);
+        options.aboveBoth = higher_option;
         console.log("higher option: " + higher_option);
     }
     return (options);
@@ -302,6 +380,41 @@ function getRatio (lum1, lum2) {
     var darkest = Math.min(lum1, lum2);
     return (brightest + 0.05) / (darkest + 0.05);
 }
+
+
+//Adjust the lch lightness of a colour until it meets the required luminance
+function adjustLightnessUp(initial_color, target_luminance){
+    //Check colour for compliance
+    working_color = initial_color.lch();
+    working_color[1] = 130;
+    for(i=0;i<100;i++){
+        test_color = chroma(working_color, 'lch');
+        if(test_color.luminance() >= target_luminance){
+            console.log(working_color);
+            return(test_color);
+        }
+        working_color[0] += 1;
+    }
+    return 'no color found';
+}
+
+function adjustLightnessDown(initial_color, target_luminance){
+    //Check colour for compliance
+    working_color = initial_color.lch();
+    //working_color[1] = 130;
+    for(i=0;i<100;i++){
+        test_color = chroma(working_color, 'lch');
+        if(test_color.luminance() <= target_luminance){
+            console.log(working_color);
+            return(test_color);
+        }
+        working_color[0] -= 1;
+    }
+    return 'no color found';
+}
+
+
+
 
 // // Calculate linear RBG from sRGB values
 // function RGBtoLinear(rgb) {
