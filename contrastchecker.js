@@ -68,9 +68,11 @@ function threeColorRecFromGivenColor () {
     color_two = chroma(r_stable_two, g_stable_two, b_stable_two);
     color_three = chroma(r_change, g_change, b_change)
     colors = modifyThreeColor(color_one, color_two, color_three, ratio);
+    printResults(colors, $('#three-color-from-color-result'));
 }
 
 function printResults (colors, results_container) {
+    results_container.empty();
     if(colors === "compliant"){
         results_container.append("<p>Already compliant</p>");
     } else {
@@ -109,13 +111,11 @@ function getThirdColor (color_one, color_two, ratio) {
     color_one_lum = color_one.luminance();
     color_two_lum = color_two.luminance();
     //Find luminances that are compliant
-    compliant_lum = thirdLuminance(color_one_lum, color_two_lum, ratio);
+    compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
     //Get a color for each of the compliant luminances
-    colors = [];
-    compliant_lum.forEach(function (lum) {
-        var new_color = chroma("white").luminance(lum);
-        new_color = TwoWayTweak(new_color, color_one, color_two, ratio, "rgb");
-        colors.push(["Grayscale", new_color]);
+    colors = makeColors(compliant_lums);
+    colors.forEach(function (color) {
+        color = TwoWayTweak(color, color_one, color_two, ratio, "rgb");
     });
     return colors;
 }
@@ -130,7 +130,7 @@ function modifyColor (initial_color, change_color, ratio) {
     initial_lum = initial_color.luminance();
     //Find luminances that are compliant
     compliant_lums = secondLuminance(initial_lum, ratio);
-    console.log("compliant lums:" + compliant_lum);
+    console.log("compliant lums:" + compliant_lums);
     //Modify the new color to meet the requirements
     return adjustColor(change_color, compliant_lums, initial_lum, ratio);
 }
@@ -145,17 +145,18 @@ function modifyThreeColor (color_one, color_two, change_color, ratio) {
     //Find luminances that are compliant
     compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
     //Get a color for each of the compliant luminances
-    return adjustThreeColor(change_color, compliant_lums, initial_lum, ratio);
+    return adjustColor(change_color, compliant_lums, ratio);
 }
 
-function adjustColor (initial_color, compliant_lums, initial_lum, ratio) {
+function adjustColor (initial_color, compliant_lums, ratio) {
     var colors = [];
+    console.log(compliant_lums);
     //Basic white interpolation option
     for (var lum in compliant_lums) {
         if(compliant_lums[lum]) {
             var new_color = chroma(initial_color).luminance(compliant_lums[lum]);
-            new_color = tweak(new_color, initial_color, ratio, "rgb");
-            colors.push(["interpolation",new_color]);
+            //new_color = tweak(new_color, initial_color, ratio, "rgb");
+            colors.push(["interpolation", new_color]);
         }
     }
     //lch Option retaining chroma and hue
@@ -164,40 +165,44 @@ function adjustColor (initial_color, compliant_lums, initial_lum, ratio) {
     for (var lumtype in compliant_lums) {
         if(compliant_lums[lumtype]) {
             if(lumtype === 'darkOption' || lumtype === 'underBoth'){
-                //Find something lower than
+                colors.push(["lch lightness change", adjustLightnessDown(initial_color, compliant_lums[lumtype])]);
             }
             if(lumtype === 'lightOption' || lumtype === 'aboveBoth'){
-                //find something higher than
+                colors.push(["lch lightness change", adjustLightnessUp(initial_color, compliant_lums[lumtype])]);
             }
         }
     }
     //Middle options
     if(compliant_lums.trueMiddle){
-        //Something close to the true middle
+        new_color = adjustLightnessBetween(initial_color, compliant_lums.trueMiddle, compliant_lums.middleDarker, compliant_lums.middleLighter);
+        colors.push(['lch true middle', new_color]);
     }
     
     if(compliant_lums.middleDarker){
-        //close to darker without going under
+        new_color = adjustLightnessBetween(initial_color, compliant_lums.middleDarker, compliant_lums.middleDarker, compliant_lums.trueMiddle);
+        colors.push(['lch middle darker', new_color]);
     }
 
     if(compliant_lums.middleLighter){
-        //close to lighter without going over
+        new_color = adjustLightnessBetween(initial_color, compliant_lums.middleLighter, compliant_lums.trueMiddle, compliant_lums.middleLighter);
+        colors.push(['lch middle lighter', new_color]);
     }
 
-    compliant_lums.forEach(function (lum) {
-        if(lum > initial_lum){
-            new_color = adjustLightnessUp(initial_color, lum);
-            if(new_color != "no color found"){
-                colors.push(['lch lightness adjustment', new_color]);
-            }
-        }
-        else {
-            new_color = adjustLightnessDown(change_color, lum);
-            if(new_color != "no color found"){
-                colors.push(['lch lightness adjustment', new_color]);
-            }
-        }
-    });
+    // compliant_lums.forEach(function (lum) {
+    //     if(lum > initial_lum){
+    //         new_color = adjustLightnessUp(initial_color, lum);
+    //         if(new_color != "no color found"){
+    //             colors.push(['lch lightness adjustment', new_color]);
+    //         }
+    //     }
+    //     else {
+    //         new_color = adjustLightnessDown(change_color, lum);
+    //         if(new_color != "no color found"){
+    //             colors.push(['lch lightness adjustment', new_color]);
+    //         }
+    //     }
+    // });
+    console.log(colors);
     return colors;
 }
 
@@ -413,8 +418,49 @@ function adjustLightnessDown(initial_color, target_luminance){
     return 'no color found';
 }
 
+function adjustLightnessBetween(initial_color, target_luminance, lower_luminance, upper_luminance) {
+    working_color = initial_color.lch();
+    console.log(working_color);
+    console.log("target lum: "+target_luminance);
+    console.log("lower lum: "+lower_luminance);
+    console.log("upper lum: "+upper_luminance);
+    
+    //Generate all possible colours across the lightness spectrum with a granularity of 0.01
+    let spectrum = Array.from(Array(101).keys())
+    spectrum = spectrum.map(function(pos){
+        return [pos, working_color[1], working_color[2]]
+    });
 
+    console.log(spectrum);
 
+    //Filter to just those with a luminosity within bounds
+    const within_bounds = spectrum.filter(withinBounds);
+    function withinBounds(colour){
+        test_color = chroma(colour, 'lch');
+        console.log(test_color);
+        console.log(test_color.luminance());
+        console.log(test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance);
+        return test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance;
+    }
+    console.log(within_bounds);
+
+    //Find the colour closest to the target
+    let final_colour = within_bounds[0]
+    let old_distance = Math.abs(chroma(within_bounds[0], 'lch').luminance(), target_luminance);
+    within_bounds.forEach(function(colour){
+        distance = Math.abs(target_luminance - chroma(colour, 'lch').luminance());
+        if(distance < old_distance){
+            old_distance = distance;
+            final_colour = colour;
+        }
+    });
+    console.log(final_colour);
+    return chroma(final_colour, 'lch');
+}
+
+function makeColors(lums) {
+    //Make colors from these lums
+}
 
 // // Calculate linear RBG from sRGB values
 // function RGBtoLinear(rgb) {
