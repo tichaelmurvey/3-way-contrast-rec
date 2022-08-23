@@ -72,7 +72,6 @@ function threeColorRecFromGivenColor () {
 }
 
 function printResults (colors, results_container) {
-    results_container.empty();
     if(colors === "compliant"){
         results_container.append("<p>Already compliant</p>");
     } else {
@@ -95,14 +94,10 @@ function getSecondColor (initial_color, ratio) {
     compliant_lums = secondLuminance(initial_lum, ratio);
     console.log(compliant_lums);
     //Get a color for each of the compliant luminances
-    colors = [];
-    for (var lum in compliant_lums) {
-        if(compliant_lums[lum]) {
-            var new_color = chroma("white").luminance(compliant_lums[lum]);
-            new_color = tweak(new_color, initial_color, ratio, "rgb");
-            colors.push(["greyscale",new_color]);
-        }
-    }
+    colors = makeColors(compliant_lums, 60);
+    colors.forEach(function (color) {
+        color[1] = tweak(color[1], initial_color, ratio, "rgb");
+    });
     return colors;
 }
 
@@ -113,9 +108,9 @@ function getThirdColor (color_one, color_two, ratio) {
     //Find luminances that are compliant
     compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
     //Get a color for each of the compliant luminances
-    colors = makeColors(compliant_lums);
+    colors = makeColors(compliant_lums, 60);
     colors.forEach(function (color) {
-        color = TwoWayTweak(color, color_one, color_two, ratio, "rgb");
+        color[1] = TwoWayTweak(color[1], color_one, color_two, ratio, "rgb");
     });
     return colors;
 }
@@ -208,7 +203,7 @@ function adjustColor (initial_color, compliant_lums, ratio) {
 
 //Tweak a color output of a given type be compliant with the ratio
 function tweak (change_color, stable_color, ratio, color_type) {
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 20; i++) {
         //Round out the values to their human readable form
         if (color_type == "rgb") {
             change_color = change_color.rgb();
@@ -458,8 +453,24 @@ function adjustLightnessBetween(initial_color, target_luminance, lower_luminance
     return chroma(final_colour, 'lch');
 }
 
-function makeColors(lums) {
-    //Make colors from these lums
+function makeColors(lums, width) {
+    let colors = [];
+    for (var lum in lums){
+        if(lums[lum]){
+            colors.push(["Grayscale", chroma('white').luminance(lums[lum])]);
+            let base_color = chroma("red").luminance(lums[lum]);
+            for(i=0; i<6; i++){
+                let rainbow_stage = base_color.lch();
+                rainbow_stage[2] += i*width;
+                if(rainbow_stage[2] > 360){
+                    rainbow_stage[2] -= 360;
+                }
+                console.log(rainbow_stage);
+                colors.push([lum, chroma(rainbow_stage, 'lch')]);
+            }
+        }
+    }
+    return colors;
 }
 
 // // Calculate linear RBG from sRGB values
