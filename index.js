@@ -8,7 +8,7 @@ function twoColorRec () {
     var g = Number($("#two-color-green").val());
     var b = Number($("#two-color-blue").val());
     var ratio = $("#ratio").val();
-    colors = getSecondColor(chroma(r, g, b), ratio);
+    let colors = getSecondColor(chroma(r, g, b), ratio);
     console.log(colors);
     $("#two-color-result").empty();
     $("#two-color-result").append("<p style=\"border-left: 18px solid rgb(" + chroma(r, g, b).rgb() + ")\" class='color-box'> Initial color: " + chroma(r, g, b).rgb() + "</p>");
@@ -25,9 +25,9 @@ function twoColorRecFromGivenColor () {
     var g2 = Number($("#two-color-changeable-color-green").val());
     var b2 = Number($("#two-color-changeable-color-blue").val());
     var ratio = $("#ratio").val();
-    stable_color = chroma(r1, g1, b1);
-    changeable_color = chroma(r2, g2, b2);
-    colors = modifyColor(stable_color, changeable_color, ratio);
+    let stable_color = chroma(r1, g1, b1);
+    let changeable_color = chroma(r2, g2, b2);
+    let colors = modifyColor(stable_color, changeable_color, ratio);
     console.log(colors);
     $("#two-color-result-from-given").empty();
     $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + stable_color.rgb() + ")\" class='color-box'> Initial color: " + stable_color.rgb() + "</p>");
@@ -42,8 +42,8 @@ function twoFromOneColorRec(){
     var g = Number($("#two-from-one-color-green").val());
     var b = Number($("#two-from-one-color-blue").val());
     var ratio = $("#ratio").val();
-    stable_color = chroma(r,g,b);
-    colors = getSecondAndThirdColors(stable_color, ratio);
+    let stable_color = chroma(r,g,b);
+    let colors = getSecondAndThirdColors(stable_color, ratio);
     console.log(colors);
     $("#two-from-one-color-result").empty();
     $("#two-from-one-color-result").append("<p style=\"border-left: 18px solid rgb(" + stable_color.rgb() + ")\" class='color-box'> Initial color: " + stable_color.rgb() + "</p>");
@@ -61,9 +61,9 @@ function threeColorRec () {
     var g_two = Number($("#three-color-two-green").val());
     var b_two = Number($("#three-color-two-blue").val());
     var ratio = Number($("#ratio").val());
-    color_one = chroma(r_one, g_one, b_one);
-    color_two = chroma(r_two, g_two, b_two);
-    colors = getThirdColor(color_one, color_two, ratio);
+    let color_one = chroma(r_one, g_one, b_one);
+    let color_two = chroma(r_two, g_two, b_two);
+    let colors = getThirdColor(color_one, color_two, ratio);
     console.log(colors);
     $("#three-color-result").empty();
     $("#three-color-result").append("<p style=\"border-left: 18px solid rgb(" + color_one.rgb() + ")\" class='color-box'> Stable color one: " + color_one.rgb() + "</p>");
@@ -83,10 +83,10 @@ function threeColorRecFromGivenColor () {
     var g_change = Number($("#three-color-changeable-color-green").val());
     var b_change = Number($("#three-color-changeable-color-blue").val());
     var ratio = $("#ratio").val();
-    color_one = chroma(r_stable_one, g_stable_one, b_stable_one);
-    color_two = chroma(r_stable_two, g_stable_two, b_stable_two);
-    color_three = chroma(r_change, g_change, b_change)
-    colors = modifyThreeColor(color_one, color_two, color_three, ratio);
+    let color_one = chroma(r_stable_one, g_stable_one, b_stable_one);
+    let color_two = chroma(r_stable_two, g_stable_two, b_stable_two);
+    let color_three = chroma(r_change, g_change, b_change)
+    let colors = modifyThreeColor(color_one, color_two, color_three, ratio);
     printResults(colors, $('#three-color-from-color-result'));
 }
 
@@ -108,12 +108,12 @@ function checkCompliant (change_color, stable_color, ratio) {
 //Produce a list of compliant options for a given color and ratio
 function getSecondColor (initial_color, ratio) {
     //Get WCAG luminance for input color
-    initial_lum = initial_color.luminance();
+    let initial_lum = initial_color.luminance();
     //Find luminances that are compliant
-    compliant_lums = secondLuminance(initial_lum, ratio);
+    let compliant_lums = secondLuminance(initial_lum, ratio);
     console.log(compliant_lums);
     //Get a color for each of the compliant luminances
-    colors = makeColors(compliant_lums, 60);
+    let colors = makeColors(compliant_lums, 60);
     colors.forEach(function (color) {
         color[1] = tweak(color[1], initial_color, ratio, "rgb");
     });
@@ -122,12 +122,12 @@ function getSecondColor (initial_color, ratio) {
 
 function getThirdColor (color_one, color_two, ratio) {
     //Get WCAG luminance for input color
-    color_one_lum = color_one.luminance();
-    color_two_lum = color_two.luminance();
+    let color_one_lum = color_one.luminance();
+    let color_two_lum = color_two.luminance();
     //Find luminances that are compliant
-    compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
+    let compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
     //Get a color for each of the compliant luminances
-    colors = makeColors(compliant_lums, 60);
+    let colors = makeColors(compliant_lums, 60);
     colors.forEach(function (color) {
         color[1] = TwoWayTweak(color[1], color_one, color_two, ratio, "rgb");
     });
@@ -136,9 +136,9 @@ function getThirdColor (color_one, color_two, ratio) {
 
 function getSecondAndThirdColors (initial_color, ratio){
     //Get WCAG luminance for input color
-    initial_color_lum = initial_color.luminance();
+    let initial_color_lum = initial_color.luminance();
     //Find luminances that are compliant
-    lums = twoMoreLuminances(initial_color_lum, ratio);
+    let lums = twoMoreLuminances(initial_color_lum, ratio);
     
 }
 
@@ -149,9 +149,9 @@ function modifyColor (initial_color, change_color, ratio) {
         return "compliant";
     }
     //Get WCAG luminance for input color
-    initial_lum = initial_color.luminance();
+    let initial_lum = initial_color.luminance();
     //Find luminances that are compliant
-    compliant_lums = secondLuminance(initial_lum, ratio);
+    let compliant_lums = secondLuminance(initial_lum, ratio);
     console.log("compliant lums:" + compliant_lums);
     //Modify the new color to meet the requirements
     return adjustColor(change_color, compliant_lums, initial_lum, ratio);
@@ -162,16 +162,16 @@ function modifyThreeColor (color_one, color_two, change_color, ratio) {
         return "compliant";
     }
     //Get WCAG luminance for input color
-    color_one_lum = color_one.luminance();
-    color_two_lum = color_two.luminance();
+    let color_one_lum = color_one.luminance();
+    let color_two_lum = color_two.luminance();
     //Find luminances that are compliant
-    compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
+    let compliant_lums = thirdLuminance(color_one_lum, color_two_lum, ratio);
     //Get a color for each of the compliant luminances
     return adjustColor(change_color, compliant_lums, ratio);
 }
 
 function adjustColor (initial_color, compliant_lums, ratio) {
-    var colors = [];
+    let colors = [];
     console.log(compliant_lums);
     //Basic white interpolation option
     for (var lum in compliant_lums) {
@@ -201,12 +201,12 @@ function adjustColor (initial_color, compliant_lums, ratio) {
     }
     
     if(compliant_lums.middleDarker){
-        new_color = adjustLightnessBetween(initial_color, compliant_lums.middleDarker, compliant_lums.middleDarker, compliant_lums.trueMiddle);
+        let new_color = adjustLightnessBetween(initial_color, compliant_lums.middleDarker, compliant_lums.middleDarker, compliant_lums.trueMiddle);
         colors.push(['lch middle darker', new_color]);
     }
 
     if(compliant_lums.middleLighter){
-        new_color = adjustLightnessBetween(initial_color, compliant_lums.middleLighter, compliant_lums.trueMiddle, compliant_lums.middleLighter);
+        let new_color = adjustLightnessBetween(initial_color, compliant_lums.middleLighter, compliant_lums.trueMiddle, compliant_lums.middleLighter);
         colors.push(['lch middle lighter', new_color]);
     }
 
@@ -230,7 +230,7 @@ function adjustColor (initial_color, compliant_lums, ratio) {
 
 //Tweak a color output of a given type be compliant with the ratio
 function tweak (change_color, stable_color, ratio, color_type) {
-    for (i = 0; i < 20; i++) {
+    for (let i = 0; i < 20; i++) {
         //Round out the values to their human readable form
         if (color_type == "rgb") {
             change_color = change_color.rgb();
@@ -269,7 +269,7 @@ function tweak (change_color, stable_color, ratio, color_type) {
 }
 
 function TwoWayTweak (change_color, stable_color_one, stable_color_two, ratio, color_type) {
-    for (i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         //Round out the values to their human readable form
         if (color_type == "rgb") {
             change_color = change_color.rgb();
@@ -343,11 +343,11 @@ function secondLuminance (oldLuminance, desired_ratio) {
         darkOption: null,
         lightOption: null
     };
-    darkOption = (oldLuminance + 0.05) / desired_ratio - 0.05;
+    let darkOption = (oldLuminance + 0.05) / desired_ratio - 0.05;
     if (darkOption > 0 && darkOption < 1) {
         options.darkOption = darkOption;
     }
-    lightOption = desired_ratio * (oldLuminance + 0.05) - 0.05;
+    let lightOption = desired_ratio * (oldLuminance + 0.05) - 0.05;
     if (lightOption > 0 && lightOption < 1) {
         options.lightOption = lightOption;
     }
@@ -367,9 +367,9 @@ function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
     };
     //Middle
     if (getRatio(darkest, brightest) > desired_ratio) {
-        middleDarker = secondLuminance(darkest, desired_ratio).lightOption;
-        middleLighter = secondLuminance(brightest, desired_ratio).darkOption;
-        trueMiddle = (middleDarker + middleLighter) / 2;
+        let middleDarker = secondLuminance(darkest, desired_ratio).lightOption;
+        let middleLighter = secondLuminance(brightest, desired_ratio).darkOption;
+        let trueMiddle = (middleDarker + middleLighter) / 2;
         if (getRatio(middleDarker, brightest) >= desired_ratio) {
             options.middleDarker = middleDarker;
             console.log("Darker middle: " + middleDarker);
@@ -385,14 +385,14 @@ function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
     }
 
     //Lower
-    lower_option = secondLuminance(darkest, desired_ratio).darkOption;
+    let lower_option = secondLuminance(darkest, desired_ratio).darkOption;
     if (lower_option > 0 && lower_option < 1) {
         options.underBoth = lower_option;
         console.log("lower option: " + lower_option);
     }
 
     //Higher
-    higher_option = secondLuminance(brightest, desired_ratio).lightOption;
+    let higher_option = secondLuminance(brightest, desired_ratio).lightOption;
     if (higher_option <= 1) {
         options.aboveBoth = higher_option;
         console.log("higher option: " + higher_option);
@@ -437,10 +437,10 @@ function getRatio (lum1, lum2) {
 //Adjust the lch lightness of a colour until it meets the required luminance
 function adjustLightnessUp(initial_color, target_luminance){
     //Check colour for compliance
-    working_color = initial_color.lch();
+    let working_color = initial_color.lch();
     working_color[1] = 130;
-    for(i=0;i<100;i++){
-        test_color = chroma(working_color, 'lch');
+    for(let i = 0;i<100;i++){
+        let test_color = chroma(working_color, 'lch');
         if(test_color.luminance() >= target_luminance){
             console.log(working_color);
             return(test_color);
@@ -452,10 +452,10 @@ function adjustLightnessUp(initial_color, target_luminance){
 
 function adjustLightnessDown(initial_color, target_luminance){
     //Check colour for compliance
-    working_color = initial_color.lch();
+    let working_color = initial_color.lch();
     //working_color[1] = 130;
-    for(i=0;i<100;i++){
-        test_color = chroma(working_color, 'lch');
+    for(let i = 0;i<100;i++){
+        let test_color = chroma(working_color, 'lch');
         if(test_color.luminance() <= target_luminance){
             console.log(working_color);
             return(test_color);
@@ -466,7 +466,7 @@ function adjustLightnessDown(initial_color, target_luminance){
 }
 
 function adjustLightnessBetween(initial_color, target_luminance, lower_luminance, upper_luminance) {
-    working_color = initial_color.lch();
+    let working_color = initial_color.lch();
     console.log(working_color);
     console.log("target lum: "+target_luminance);
     console.log("lower lum: "+lower_luminance);
@@ -483,7 +483,7 @@ function adjustLightnessBetween(initial_color, target_luminance, lower_luminance
     //Filter to just those with a luminosity within bounds
     const within_bounds = spectrum.filter(withinBounds);
     function withinBounds(colour){
-        test_color = chroma(colour, 'lch');
+        let test_color = chroma(colour, 'lch');
         console.log(test_color);
         console.log(test_color.luminance());
         console.log(test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance);
@@ -495,7 +495,7 @@ function adjustLightnessBetween(initial_color, target_luminance, lower_luminance
     let final_colour = within_bounds[0]
     let old_distance = Math.abs(chroma(within_bounds[0], 'lch').luminance(), target_luminance);
     within_bounds.forEach(function(colour){
-        distance = Math.abs(target_luminance - chroma(colour, 'lch').luminance());
+        let distance = Math.abs(target_luminance - chroma(colour, 'lch').luminance());
         if(distance < old_distance){
             old_distance = distance;
             final_colour = colour;
@@ -511,7 +511,7 @@ function makeColors(lums, width) {
         if(lums[lum]){
             colors.push(["Grayscale", chroma('white').luminance(lums[lum])]);
             let base_color = chroma("red").luminance(lums[lum]);
-            for(i=0; i<6; i++){
+            for(let i = 0; i<6; i++){
                 let rainbow_stage = base_color.lch();
                 rainbow_stage[2] += i*width;
                 if(rainbow_stage[2] > 360){
@@ -525,4 +525,4 @@ function makeColors(lums, width) {
     return colors;
 }
 
-module.exports = { getSecondColor, twoColorRec, twoColorRecFromGivenColor, threeColorRec, threeColorRecFromGivenColor }
+module.exports = { getSecondColor, twoColorRec, twoColorRecFromGivenColor, threeColorRec, threeColorRecFromGivenColor, twoFromOneColorRec }
