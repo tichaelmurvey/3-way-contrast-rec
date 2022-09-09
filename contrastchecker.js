@@ -31,6 +31,22 @@ function twoColorRecFromGivenColor () {
     $("#two-color-result-from-given").append("<p style=\"border-left: 18px solid rgb(" + changeable_color.rgb() + ")\" class='color-box'> Changed color: " + changeable_color.rgb() + "</p>");
     printResults(colors, $("#two-color-result-from-given"));
 }
+
+function twoFromOneColorRec(){
+    console.log("starting two from one rec");
+    //Get the value of input fields
+    var r = Number($("#two-from-one-color-red").val());
+    var g = Number($("#two-from-one-color-green").val());
+    var b = Number($("#two-from-one-color-blue").val());
+    var ratio = $("#ratio").val();
+    stable_color = chroma(r,g,b);
+    colors = getSecondAndThirdColors(stable_color, ratio);
+    console.log(colors);
+    $("#two-from-one-color-result").empty();
+    $("#two-from-one-color-result").append("<p style=\"border-left: 18px solid rgb(" + stable_color.rgb() + ")\" class='color-box'> Initial color: " + stable_color.rgb() + "</p>");
+    printResults(colors, $("#two-from-one-color-result"));
+}
+
 //Event handler for three color recommender (from two given colors)
 function threeColorRec () {
     console.log("starting threeColorRec");
@@ -113,6 +129,14 @@ function getThirdColor (color_one, color_two, ratio) {
         color[1] = TwoWayTweak(color[1], color_one, color_two, ratio, "rgb");
     });
     return colors;
+}
+
+function getSecondAndThirdColors (initial_color, ratio){
+    //Get WCAG luminance for input color
+    initial_color_lum = initial_color.luminance();
+    //Find luminances that are compliant
+    lums = twoMoreLuminances(initial_color_lum, ratio);
+    
 }
 
 //Modify an existing color to meet contrast with another color
@@ -373,6 +397,31 @@ function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
     return (options);
 }
 
+
+function twoMoreLuminances(oldLuminance, desired_ratio){
+    let options = {
+        bothBelow: null,
+        bothAbove: null,
+        around: null,
+    };
+    let second_luminance = secondLuminance(oldLuminance, desired_ratio);
+    if(second_luminance.darkOption){
+        third_luminance = thirdLuminance(oldLuminance, second_luminance.darkOption, desired_ratio);
+        if(third_luminance.underBoth){
+            options.bothBelow = {middle: second_luminance.darkOption, bottom: third_luminance.underBoth};
+        }
+        if(third_luminance.aboveBoth){
+            options.around = {bottom: second_luminance.darkOption, top: third_luminance.aboveBoth};
+        }
+    }
+    if(second_luminance.lightOption){
+        third_luminance = thirdLuminance(oldLuminance, second_luminance.lightOption, desired_ratio);
+        if(third_luminance.aboveBoth){
+            options.bothAbove = {middle: second_luminance.lightOption, top: third_luminance.aboveBoth};
+        }
+    }
+    return(options);
+}
 
 //Gets contrast ratio between two relative luminosities
 function getRatio (lum1, lum2) {
