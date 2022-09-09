@@ -31,7 +31,7 @@
     <input type="text" id="two-color-green" />
     <label for="two-color-blue">Blue</label>
     <input type="text" id="two-color-blue" />
-    <button onclick="twoColorRec()" id="two-color-rec">
+    <button onclick="ContrastChecker.twoColorRec()" id="two-color-rec">
       Get recommendations
     </button>
     <div id="two-color-result"></div>
@@ -52,7 +52,7 @@
     <label for="two-color-changeable-color-blue">Blue</label>
     <input type="text" id="two-color-changeable-color-blue" />
     <button
-      onclick="twoColorRecFromGivenColor()"
+      onclick="ContrastChecker.twoColorRecFromGivenColor()"
       id="two-color-rec-from-given-color"
     >
       Get recommendations
@@ -67,7 +67,10 @@
     <input type="text" id="two-from-one-color-green" />
     <label for="two-from-one-color-blue">Blue</label>
     <input type="text" id="two-from-one-color-blue" />
-    <button onclick="twoFromOneColorRec()" id="two-from-one-color-rec">
+    <button
+      onclick="ContrastChecker.twoFromOneColorRec()"
+      id="two-from-one-color-rec"
+    >
       Get recommendations
     </button>
     <div id="two-from-one-color-result"></div>
@@ -87,7 +90,7 @@
     <input type="text" id="three-color-two-green" />
     <label for="three-color-two-blue">Blue</label>
     <input type="text" id="three-color-two-blue" />
-    <button onclick="threeColorRec()" id="three-color-rec">
+    <button onclick="ContrastChecker.threeColorRec()" id="three-color-rec">
       Get recommendations
     </button>
     <div id="three-color-result"></div>
@@ -115,7 +118,7 @@
     <label for="three-color-changeable-color-blue">Blue</label>
     <input type="text" id="three-color-changeable-color-blue" />
     <button
-      onclick="threeColorRecFromGivenColor()"
+      onclick="ContrastChecker.threeColorRecFromGivenColor()"
       id="three-color-rec-from-given-color"
     >
       Get recommendations
