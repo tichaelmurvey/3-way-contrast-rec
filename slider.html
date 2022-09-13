@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.js"
+      integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
+      integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="sliderdeploy.js"></script>
+    <link rel="stylesheet" href="slider.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>lch 3 way contrast colour picker</h1>
+    <label for="ratio">Ratio: </label>
+    <input id="ratio" type="text" value="3" />
+    <div class="mode">
+      <button id="two-colors" class="mode-change" aria-current="true">
+        Two colours
+      </button>
+      <button id="three-colors" class="mode-change" aria-current="false">
+        Three colours
+      </button>
+    </div>
+    <div class="colors">
+      <div id="color-one" class="color">
+        <div class="preview"></div>
+        <label for="color-one-input">RGB: </label>
+        <input id="color-one-input" class="rgb-input" type="text" />
+        <label for="lightness-one">Lightness: </label>
+        <input id="lightness-one" class="lightness lch-input" type="text" />
+        <input
+          type="range"
+          class="slider lightness one"
+          id="lightness-one-range"
+          min="0"
+          max="100"
+        />
+        <label for="chroma-one">Chroma: </label>
+        <input id="chroma-one" class="chroma lch-input" type="text" />
+        <input
+          type="range"
+          class="slider chroma one"
+          id="chroma-one-range"
+          min="0"
+          max="130"
+        />
+        <label for="hue-one">Hue: </label>
+        <input for="hue-one" class="hue lch-input" type="text" />
+        <input
+          type="range"
+          class="slider hue one"
+          id="hue-one-range"
+          min="0"
+          max="360"
+        />
+        <div class="luminance" id="luminance-one"></div>
+        <div class="error"></div>
+        <div class="recommender">
+          <div class="checkbox">
+            <input type="checkbox" value="keep-color-one" id="keep-color-one" />
+            <label for="keep-color-one">Keep this colour the same</label>
+          </div>
+          <!-- <div class="checkbox">
+            <input
+              type="checkbox"
+              value="generate-color-one"
+              id="generate-color-one"
+            />
+            <label for="generate-color-one"
+              >Generate a new colour from scratch</label
+            >
+          </div> -->
+        </div>
+      </div>
+      <div id="color-two" class="color">
+        <div class="preview"></div>
+        <label for="color-two-input">RGB: </label>
+        <input id="color-two-input" class="rgb-input" type="text" />
+        <label for="lightness-two">Lightness: </label>
+
+        <input id="lightness-two" class="lightness lch-input" type="text" />
+        <input
+          type="range"
+          class="slider lightness two"
+          id="lightness-two-range"
+          min="0"
+          max="100"
+        />
+        <label for="chroma-two">Chroma: </label>
+        <input id="chroma-two" class="chroma lch-input" type="text" />
+        <input
+          type="range"
+          class="slider chroma two"
+          id="chroma-two-range"
+          min="0"
+          max="130"
+        />
+        <label for="hue-two">Hue: </label>
+        <input for="hue-two" class="hue lch-input" type="text" />
+        <input
+          type="range"
+          class="slider hue two"
+          id="hue-two-range"
+          min="0"
+          max="360"
+        />
+        <div class="luminance" id="luminance-two"></div>
+        <div class="error"></div>
+        <div class="recommender">
+          <div class="checkbox">
+            <input type="checkbox" value="keep-color-two" id="keep-color-two" />
+            <label for="keep-color-two">Keep this colour the same</label>
+          </div>
+          <!-- <div class="checkbox">
+            <input
+              type="checkbox"
+              value="generate-color-two"
+              id="generate-color-two"
+            />
+            <label for="generate-color-two"
+              >Generate a new colour from scratch</label
+            >
+          </div> -->
+        </div>
+      </div>
+      <div id="color-three" class="color">
+        <div class="preview"></div>
+        <label for="color-three-input">RGB: </label>
+        <input id="color-three-input" class="rgb-input" type="text" />
+        <label for="lightness-three">Lightness: </label>
+        <input id="lightness-three" class="lightness lch-input" type="text" />
+        <input
+          type="range"
+          class="slider lightness two"
+          id="lightness-two-range"
+          min="0"
+          max="100"
+        />
+        <label for="chroma-three">Chroma: </label>
+        <input id="chroma-three" class="chroma lch-input" type="text" />
+        <input
+          type="range"
+          class="slider chroma three"
+          id="chroma-three-range"
+          min="0"
+          max="130"
+        />
+        <label for="hue-three">Hue: </label>
+        <input for="hue-three" class="hue lch-input" type="text" />
+        <input
+          type="range"
+          class="slider hue three"
+          id="hue-three-range"
+          min="0"
+          max="360"
+        />
+        <div class="luminance" id="luminance-three"></div>
+
+        <div class="error"></div>
+        <div class="recommender">
+          <div class="checkbox">
+            <input
+              type="checkbox"
+              value="keep-color-three"
+              id="keep-color-three"
+            />
+            <label for="keep-color-three">Keep this colour the same</label>
+          </div>
+          <!-- <div class="checkbox">
+            <input
+              type="checkbox"
+              value="generate-color-three"
+              id="generate-color-three"
+            />
+            <label for="generate-color-three"
+              >Generate a new colour from scratch</label
+            >
+          </div> -->
+        </div>
+      </div>
+    </div>
+    <button id="get-modifications">
+      Recommend modified versions of these colours
+    </button>
+    <button id="get-recommendations">Recommend new colours</button>
+    <div class="results"></div>
+  </body>
+</html>

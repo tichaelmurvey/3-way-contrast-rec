@@ -1,0 +1,51 @@
+.preview {
+    display: block;
+    background-color: blue;
+    min-height: 150px;
+    margin: 5px 0;
+}
+
+.color {
+    width: min-content;
+    margin: 12px;
+    border: 2px  solid grey;
+    padding: 12px;
+}
+
+.colors {
+    display: flex;
+    justify-content: center;
+}
+
+body {
+    font-family: arial, sans-serif;
+    text-align: center;
+}
+
+.slider {
+    width: 100%;
+}
+
+.mode button {
+    margin: 12px;
+}
+
+.checkbox {
+    display: flex;
+    text-align: left;
+    margin: 10px 0;
+}
+
+.color-set {
+    margin: 12px auto;
+    padding: 12px;
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 500px;
+    text-align: left;
+}
+
+.color-box {
+    margin: 8px; 12px;
+    display: block;
+}
