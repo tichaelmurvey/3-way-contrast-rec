@@ -1,3 +1,7 @@
+h2 {
+    margin: 0;
+}
+
 .preview {
     display: block;
     background-color: blue;
@@ -48,4 +52,18 @@ body {
 .color-box {
     margin: 8px; 12px;
     display: block;
+}
+
+.examples {
+    display: flex;
+    width: 500px;
+    margin:auto;
+    justify-content: center;
+}
+
+.example {
+    border: 2px  solid grey;
+    padding: 24px;
+    margin: 12px;
+    font-size: 1.5rem;
 }
