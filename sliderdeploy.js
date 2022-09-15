@@ -14505,22 +14505,9 @@ var Slider = (function () {
 	//Print colour results to results container on the page.
 	function printResults (color_sets, results_container) {
 	    results_container.empty();
-	    // if(colors === "compliant"){
-	    //     results_container.append("<p>Already compliant</p>");
-	    // } else {
-	    //     colors.forEach(function (color) {
-	    //         let colour_info
-	    //         if(chroma.valid(color.chroma_value)){
-	    //             colour_info = color.chroma_value.rgb();
-	    //         } else {
-	    //             colour_info = color.chroma_value;
-	    //         }
-	    //         results_container.append("<p style=\"border-left: 18px solid rgb(" + colour_info + ")\" class='color-box'>" + colour_info + " "+color.type + "</p>");
-	    //     });
-	    // }
 	    if(Array.isArray(color_sets)){
 	        color_sets.forEach( function(color_set, index){
-	            results_container.append("<p class = \'color-set\' id=\'color-set-" + index + "\'></p>");
+	            results_container.append("<div class = \'color-set\' id=\'color-set-" + index + "\'></div>");
 	            color_set.forEach( function(colour){
 	                let colour_info;
 	                if(chroma.valid(colour.chroma_value)){
@@ -14529,8 +14516,13 @@ var Slider = (function () {
 	                    colour_info = colour.chroma_value;
 	                }
 	                $("#color-set-"+index).append("<span style=\"border-left: 18px solid rgb(" + colour_info + ")\" class='color-box'>" + colour_info + " "+colour.type + "</span>");
-	            }
-	            );
+	            });
+	            $("#color-set-"+index).append("<button id=\'use-" + index + "\'>Use</button>" );
+	            $("#use-"+index).on("click", function(){
+	                color_set.forEach(function(colour){
+	                    updateColourFromChroma(colour.chroma_value, $(".color-" + colour.num));
+	                });
+	            });
 	        });
 	    } else {
 	    results_container.append("<p class = \'text-result\'>"+ color_sets + "</p>");
@@ -14778,7 +14770,6 @@ var Slider = (function () {
 	    for(let i = 0;i<100;i++){
 	        let test_color = chroma(working_color, 'lch');
 	        if(test_color.luminance() >= target_luminance){
-	            console.log(working_color);
 	            return(test_color);
 	        }
 	        working_color[0] += 1;
@@ -14793,7 +14784,6 @@ var Slider = (function () {
 	    for(let i = 0;i<100;i++){
 	        let test_color = chroma(working_color, 'lch');
 	        if(test_color.luminance() <= target_luminance){
-	            console.log(working_color);
 	            return(test_color);
 	        }
 	        working_color[0] -= 1;
@@ -14809,22 +14799,20 @@ var Slider = (function () {
 	    console.log("upper lum: "+upper_luminance);
 	    
 	    //Generate all possible colours across the lightness spectrum with a granularity of 0.01
-	    let spectrum = Array.from(Array(101).keys());
+	    let spectrum = Array.from(Array(1010).keys());
 	    spectrum = spectrum.map(function(pos){
-	        return [pos, working_color[1], working_color[2]]
+	        return [pos/10, working_color[1], working_color[2]]
 	    });
-
-	    console.log(spectrum);
-
 	    //Filter to just those with a luminosity within bounds
-	    const within_bounds = spectrum.filter(withinBounds);
-	    function withinBounds(colour){
+	    let within_bounds = spectrum.filter( function(colour){
 	        let test_color = chroma(colour, 'lch');
-	        console.log(test_color);
-	        console.log(test_color.luminance());
-	        console.log(test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance);
+	        // console.log(test_color);
+	        // console.log(test_color.luminance());
+	        // console.log(test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance);
 	        return test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance;
-	    }
+
+	    });
+	    console.log("within bounds:");
 	    console.log(within_bounds);
 
 	    //Find the colour closest to the target
@@ -14837,6 +14825,7 @@ var Slider = (function () {
 	            final_colour = colour;
 	        }
 	    });
+	    console.log("final colour:");
 	    console.log(final_colour);
 	    return chroma(final_colour, 'lch');
 	}
@@ -14863,6 +14852,8 @@ var Slider = (function () {
 	function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
 	    var brightest = Math.max(first_luminance, second_luminance);
 	    var darkest = Math.min(first_luminance, second_luminance);
+	    console.log("darkest: "+ darkest);
+	    console.log("brightest: "+ brightest);
 	    let options = {
 	        underBoth: null,
 	        aboveBoth: null,
@@ -14872,16 +14863,36 @@ var Slider = (function () {
 	    };
 	    //Middle
 	    if (getRatio(darkest, brightest) > desired_ratio) {
+	        console.log("space between lums:");
+	        console.log(getRatio(darkest, brightest));
+	        console.log("finding middle");
+	        //Get luminance that is compliant with the darkest stable colour
 	        let middleDarker = secondLuminance(darkest, desired_ratio).lightOption;
+	        console.log("middle darker:");
+	        console.log(middleDarker);
+
+	        //Get luminance that is compliant with the lightest stable colour
 	        let middleLighter = secondLuminance(brightest, desired_ratio).darkOption;
+	        console.log("middle lighter:");
+	        console.log(middleLighter);
+
+	        //Get luminance that is exactly between the lightest and darkest stable colours
 	        let trueMiddle = (middleDarker + middleLighter) / 2;
+
+	        //Check that new luminances are compliant with both existing stable luminances
 	        if (getRatio(middleDarker, brightest) >= desired_ratio) {
 	            options.middleDarker = middleDarker;
 	            console.log("Darker middle: " + middleDarker);
+	        } else {
+	            console.log("failed middleDarker with a contrast of");
+	            console.log(getRatio(middleDarker, brightest));
 	        }
 	        if (getRatio(middleLighter, darkest) >= desired_ratio) {
 	            options.middleLighter = middleLighter;
 	            console.log("Lighter middle option: " + middleLighter);
+	        } else {
+	            console.log("failed middleLighter with a contrast of");
+	            console.log(getRatio(middleLighter, darkest));
 	        }
 	        if ((getRatio(trueMiddle, darkest) >= desired_ratio) && (getRatio(trueMiddle, brightest) >= desired_ratio)) {
 	            options.trueMiddle = trueMiddle;
@@ -15055,6 +15066,23 @@ var Slider = (function () {
 
 	//=========================Manage and propogate changes to colour input fields========================
 
+	function updateColourFromChroma(colour, container){
+	    container.find(".preview").css({"background-color": "rgb("+colour.rgb()+")"});
+	    //Update LCH fields
+	    let new_lch = colour.lch();
+	    container.find(".lightness").val(Math.round(new_lch[0]));
+	    container.find(".chroma").val(Math.round(new_lch[1]));
+	    container.find(".hue").val(Math.round(new_lch[2]));
+	    container.find(".rgb-input").val(colour.rgb());
+	    container.find(".slider.lightness").val(new_lch[0]);
+	    container.find(".slider.chroma").val(new_lch[1]);
+	    container.find(".slider.hue").val(new_lch[2]);
+	    updateLuminance(colour, container);
+	    checkCompliance();
+	    updateExamples();
+
+	}
+
 	function updateColorFromRGB(color_string, container){
 	    let rgb_values = color_string.split(",");
 	    if(chroma.valid(rgb_values)){
@@ -15074,11 +15102,11 @@ var Slider = (function () {
 	}
 
 	function updateColorFromLCH(container){
-	    console.log("updating from lch");
+	    // console.log("updating from lch");
 	    let lch_values = [Number(container.find(".lightness").val()), Number(container.find(".chroma").val()), Number(container.find(".hue").val())];
-	    console.log(lch_values);
+	    // console.log(lch_values);
 	    let new_color = chroma(lch_values, 'lch');
-	    console.log("new color: " + new_color);
+	    // console.log("new color: " + new_color);
 	    //Update display colour
 	    container.find(".preview").css({"background-color": "rgb("+new_color.rgb()+")"});
 	    //Update RGB fields
@@ -15110,8 +15138,8 @@ var Slider = (function () {
 	            if(index != i){
 	                let ratio = chroma.contrast(my_color, colors[i]);
 	                if(ratio < $("#ratio").val()){
-	                    console.log("error on color " + index + " against color " + i);
-	                    console.log($(this));
+	                    // console.log("error on color " + index + " against color " + i);
+	                    // console.log($(this));
 	                    $(this).find(".error").append("<p>Not compliant with color " + (i+1) + ". Ratio of " + Math.round(ratio*100)/100 + ".</p>");
 	                }
 	            }
