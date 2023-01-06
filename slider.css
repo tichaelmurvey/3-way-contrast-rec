@@ -50,7 +50,7 @@ body {
 }
 
 .color-box {
-    margin: 8px; 12px;
+    margin: 8px;
     display: block;
 }
 
@@ -66,4 +66,8 @@ body {
     padding: 24px;
     margin: 12px;
     font-size: 1.5rem;
+}
+
+.example a {
+    text-decoration: none;
 }
