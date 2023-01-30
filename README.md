@@ -1,45 +1,26 @@
-# Contrast Checker
+# All purpose contrast checker
 
-Prerequisite: NodeJS v16
+Colors on websites should have good contrast with one another. This helps everyone understand the website.
 
-## 1. Bundle the javascript (using Rollup)
+There are a lot of good tools for when you need to check the contrast of two colors. Some even recommend colours.
 
-`contrastchecker.js` is now an auto-generated file, make changes in `index.js` and run the following command to update `contrastchecker.js`:
+Mine is the first that makes recommendations for 3 colors.
 
-```
-npm run rollup
-```
+[View the live site](https://tichaelmurvey.github.io/contrastrolabe/slider)
 
-This allows you to develop using the npm package ecosystem, but also include it in a .html file with:
+## Why do you need three colors
 
-```
-<script src="contrastchecker.js"></script>
-```
+Sometimes websites have more than two colors. I am personally against this frankly insane design philosophy but I am trying to be less judgemental.
 
-**Note**
+Examples of when you need three colors to match include:
 
-You must use "ContrastChecker" as the namespace to use the functions, for example:
+* Buttons with a focus outline
+* Some weirdo design like a menu with multiple colors
+* Links without an underline (but don't do this)
 
-```
-<button onclick="ContrastChecker.twoColorRec()" id="two-color-rec">
-  Get recommendations
-</button>
-```
+## How it works
 
-## 2. Serve the html
+The site uses the Chroma.js library for WCAG checking, and a lot of messy JS code in the front end for colour generation.
 
-In your root directory, run:
+The main challenge is that often the needle for a 3 way compliance is so narrow, that floating point and rounding errors come into the results.
 
-```
-npx serve .
-```
-
-## 3. Live reload while developing
-
-In two terminals, run `npx serve .` and `npm run watch` at the same time - the `contrastchecker.js` bundle will update automatically as you make changes to `index.js`, all you need to do is refresh your browser to test the changes you just made to your app.
-
-## 4. Running tests
-
-``` 
-npm run test
-```
