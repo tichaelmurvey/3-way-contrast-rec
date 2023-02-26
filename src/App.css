@@ -1,0 +1,158 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 48px;
+    font-size: 18px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.toolset {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.section {
+    flex: 1 1 10rem;
+    min-width: min-content;
+    max-width: fit-content;
+
+}
+
+.example-list div{
+    display: block;
+}
+h2 {
+    font-size: 22px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+.section {
+    padding: 24px 50px;
+    margin-right: 20px;
+    background-color: rgb(248, 248, 248);
+    margin-bottom: 20px;
+
+}
+
+
+.section h2 {
+    padding-bottom: 12px;
+    border-bottom: 1px solid gray;    
+}
+
+.fixes {
+    max-width: max-content;
+}
+
+
+/* CHOOSE COMPONENT STYLES */
+.choose-example {
+    min-width: max-content;
+}
+
+fieldset {
+    border: none;
+    padding: 0;
+}
+
+fieldset div {
+    margin: 12px 0;
+    padding: 0;
+}
+
+fieldset label {
+    display: grid;
+    grid-template-columns: 1em auto;
+    gap: 0.5em;
+}
+
+input[type="radio"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    color: black;
+    width: 1.15em;
+    height: 1.15em;
+    border: 1px solid black;
+    border-radius: 50%;
+    transform: translateY(0.3em);
+    display: grid;
+    place-content: center;  
+  }
+
+  input[type="radio"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 0.5em 0.5em black;
+  }
+  
+  input[type="radio"]:checked::before {
+    transform: scale(1);
+  }
+
+/* COLOR INPUT STYLES */
+
+.color-input {
+    margin: 20px 0;
+    align-items: center;
+}
+
+.color-input label {
+    display: block;
+}
+
+.color-input input{
+    height: 36px;
+    vertical-align: top;
+    border: 1px solid black;
+    padding: 0 12px;
+}
+
+.color-preview {
+    width: 36px;
+    height: 36px;
+    border: 1px solid black;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.color-container {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+/* RESULTS STYLES */
+.results {
+    flex-basis: 1;
+}
+
+
+/* HOW IT LOOKS STYLES */
+.example {
+    flex-basis: 3;
+}
+
+
+.example button {
+    background: white;
+    border: 2px solid black;
+    border-radius: 3px;
+    padding: 6px;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 12px 0;
+}

@@ -1,56 +1,63 @@
-const chroma = require('chroma-js')
-const $ = require('jquery')
-
-
 //==========================DOM event listeners==========================
 console.log('running');
 let thirdColor = false;
-$(document).ready(function(){
-    //Set default values
-    $("#color-one-input").val("0, 131, 119");
-    $("#color-two-input").val("255, 255, 255");
-    $("#color-three-input").val("0, 0, 0");
-    updateColorFromRGB($("#color-one-input").val(), $("#color-one-input").parent());
-    updateColorFromRGB($("#color-two-input").val(), $("#color-two-input").parent());
-    updateColorFromRGB($("#color-three-input").val(), $("#color-three-input").parent());
-    //Hide the third color
-    $("#color-three").hide();
-    $(".three-colour-example").hide()
-    //Listen for changes on the mode buttons
-    $(".mode-change").on("click", function(){
-        changeMode($(this).attr('id'))
-    });
-    //Listen for changes in the RGB input
-    $(".rgb-input").on("input", function(){
-        updateColorFromRGB($(this).val(), $(this).parent())
-    });
-    //Listen for changes in the LCH input
-    $(".lch-input").on("input", function(){
-        updateColorFromLCH($(this).parent());
-    });
-    //Listen for changes in slider input
-    $(".slider").on("input", function(){
-        $(this).prev().val($(this).val());
-        updateColorFromLCH($(this).parent());
-    });
-    //Listen for changes in ratio
-    $("#ratio").on("input", function(){
-        checkCompliance();
-    });
-    //Listen for "recommend new colours" button
-    $("#get-recommendations").on("click", function(){
-        let colours = getRecommendations(true);
-        console.log("Got recommendations")
-        console.log(colours)
-        printResults(colours, $(".results"));
-    });
-    //Listen for "modify existing colours" button
-    $("#get-modifications").on("click", function(){
-        let colours = getRecommendations(false);
-        console.log("got modifications")
-        console.log(colours)
-        printResults(colours, $(".results"));
-    });
+let ratio = 4.5;
+//Set default values
+$("#color-one-input").val("0, 131, 119");
+$("#color-two-input").val("255, 255, 255");
+$("#color-three-input").val("0, 0, 0");
+updateColorFromRGB($("#color-one-input").val(), $("#color-one-input").parent());
+updateColorFromRGB($("#color-two-input").val(), $("#color-two-input").parent());
+updateColorFromRGB($("#color-three-input").val(), $("#color-three-input").parent());
+//Hide the third color
+$("#color-three").hide();
+$(".three-colour-example").hide()
+//Listen for changes on the mode buttons
+$(".mode-change").on("click", function(){
+    changeMode($(this).attr('id'))
+});
+//Listen for changes in the RGB input
+$(".rgb-input").on("input", function(){
+    updateColorFromRGB($(this).val(), $(this).parent())
+});
+//Listen for changes in the LCH input
+$(".lch-input").on("input", function(){
+    updateColorFromLCH($(this).parent());
+});
+//Listen for changes in slider input
+$(".slider").on("input", function(){
+    $(this).prev().val($(this).val());
+    updateColorFromLCH($(this).parent());
+});
+
+//Listen for changes in ratio
+$("#4.5").on("click", function(){
+    ratio = 4.5;
+    $("#4.5").attr("aria-current", "true");
+    $("#3").attr("aria-current", "false");
+    checkCompliance();
+})
+
+$("#3").on("click", function(){
+    ratio = 3;
+    $("#4.5").attr("aria-current", "false");
+    $("#3").attr("aria-current", "true");
+    checkCompliance();
+})
+
+//Listen for "recommend new colours" button
+$("#get-recommendations").on("click", function(){
+    let colours = getRecommendations(true);
+    console.log("Got recommendations")
+    console.log(colours)
+    printResults(colours, $(".results"));
+});
+//Listen for "modify existing colours" button
+$("#get-modifications").on("click", function(){
+    let colours = getRecommendations(false);
+    console.log("got modifications")
+    console.log(colours)
+    printResults(colours, $(".results"));
 });
 
 

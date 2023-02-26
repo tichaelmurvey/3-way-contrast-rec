@@ -15,14 +15,19 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
-    <script src="sliderdeploy.js"></script>
     <link rel="stylesheet" href="slider.css" />
     <title>Document</title>
   </head>
   <body>
     <h1>lch 3 way contrast colour picker</h1>
-    <label for="ratio">Ratio: </label>
-    <input id="ratio" type="text" value="3" />
+    <div class="ratio mode">
+      <button id="4.5" class="ratio-change" aria-current="true">
+        4.5
+      </button>
+      <button id="3" class="ratio-change" aria-current="false">
+        3
+      </button>
+    </div>
     <div class="mode">
       <button id="two-colors" class="mode-change" aria-current="true">
         Two colours
@@ -207,4 +212,5 @@
     <button id="get-recommendations">Recommend new colours</button>
     <div class="results"></div>
   </body>
+  <script src="slider.js"></script>
 </html>
