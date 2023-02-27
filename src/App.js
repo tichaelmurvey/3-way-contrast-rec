@@ -3,12 +3,13 @@ import Radio from './components/radio';
 import TestColors from './components/testColors';
 import Results from './components/results';
 import Preview from './components/preview';
+import Fixes from './components/fixes'
 import {testCases} from './data';
 import { useState } from 'react';
 
 function App() {
   const [testCase, setTestCase] = useState(testCases[0]);
-  const [testColors, setTestColors] = useState(["#000000", "#FFFFFF", "#0000FF"]);
+  const [testColors, setTestColors] = useState(["#FFFFFF", "#000000", "#006DFF"]);
   function handleTestChange(testCase){
     setTestCase(testCase);
   }
@@ -43,25 +44,10 @@ function App() {
             </fieldset>
           </div>
           <TestColors changeColors={handleTestColorChange} test={testCase} colors={testColors}/>
-          <Results test={testCase}/>
-          <Preview test={testCase}/>
+          <Results test={testCase} colors={testColors}/>
+          <Preview test={testCase} colors={testColors}/>
         </div>
-        <div className="section fixes">
-          <h2>👩‍🏫 Recommend colours</h2>
-          <p>Choose which colours to change</p>
-          <label htmlFor="color-one-checkbox">Color 1</label>
-          <input type="checkbox" id="color-one-checkbox" />
-          <label htmlFor="color-two-checkbox">Color 2</label>
-          <input type="checkbox" id="color-two-checkbox" />
-          <label htmlFor="color-three-checkbox">Color 3</label>
-          <input type="checkbox" id="color-three-checkbox" />
-          <div className="results">
-            <p>x results found</p>
-            <div className="result" />
-            <div className="result" />
-            <div className="result" />
-          </div>
-        </div>
+        <Fixes test={testCase} colors={testColors}/>
     </>
   );
 }

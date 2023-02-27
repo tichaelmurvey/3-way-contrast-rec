@@ -5,8 +5,8 @@ export const testCases =  [
         ratio: 3,
         colors: [
             "Background",
-            "Button",
-            "Focus outline"
+            "Focus outline",
+            "Button"
         ],
         triangle: true,
         req: "Focused buttons description."
@@ -21,7 +21,7 @@ export const testCases =  [
             "Link text"
         ],
         triangle: true,
-        req: "Links without underlines need to be contrast compliant with the backgrounad and with other text at a ratio of 4.5. If you underline links, they don't need to contrast with other text."
+        req: "Links without underlines need to be contrast compliant with the background and with other text at a ratio of 4.5. If you underline links, they don't need to contrast with other text."
     },
     {
         testCase: "text_regular",
@@ -55,7 +55,7 @@ export const testCases =  [
             "Color 3"
         ],
         triangle: true,
-        req: "Just three colors"
+        req: "Meaningful UI elements need a contrast ratio of 3."
     },
     {
         testCase: "neutral_2",
@@ -66,6 +66,6 @@ export const testCases =  [
             "Color 2",
         ],
         triangle: false,
-        req: "Just two colors"
+        req: "Meaningful UI elements need a contrast ratio of 3."
     }
 ]

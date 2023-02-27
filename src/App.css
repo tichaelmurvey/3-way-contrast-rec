@@ -5,7 +5,6 @@
 }
 
 body{
-    font-family: Arial, Helvetica, sans-serif;
     margin: 48px;
     font-size: 18px;
     font-family: 'Open Sans', sans-serif;
@@ -140,19 +139,103 @@ input[type="radio"] {
     flex-basis: 1;
 }
 
-
-/* HOW IT LOOKS STYLES */
-.example {
-    flex-basis: 3;
+.passfail {
+    font-weight: 400;
+    padding: 12px;
+    border-radius: 6px;
 }
 
+.passfail.pass {
+    background-color: rgb(171, 246, 171);
+}
+
+.passfail.fail {
+    background-color: rgb(249, 193, 193);
+}
+
+.ratio-result {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    font-size: 1rem;
+}
+
+.ratio-preview{
+    border: 1px solid black;
+    min-width: 40px;
+    margin-right: 12px;
+    display: inline-flex;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ratio-preview div{
+    display: block;
+    width: 20px !important;
+    height: 40px !important;
+}
+
+/* HOW IT LOOKS STYLES */
+
+.example {
+    border: 4px dashed black;
+    padding: 12px;
+}
 
 .example button {
-    background: white;
-    border: 2px solid black;
     border-radius: 3px;
     padding: 6px;
     font-size: 15px;
     font-family: Arial, Helvetica, sans-serif;
+    display: block;
+    margin: 12px auto;
+}
+
+.example.two-colors-example, .example.three-colors-example{
+    padding: 0 !important;
+    border: none !important;
+}
+
+.example.large-text-example {
+    font-size: 24px;
+}
+
+svg {
+    border: 4px black dashed;
+}
+
+/* FIXES */
+
+.changeSelect {
+    border: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background-color: white;
     margin: 12px 0;
+    align-items: center;
+    width: fit-content;
+}
+
+.changeSelect * {
+    margin: 0 12px;
+}
+
+.changeSelect input {
+    width: 20px;
+    height: 20px;
+}
+
+button.get-fixes {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.2rem;
+    color: white;
+    background-color: #006DFF;
+    border-radius: 6px;
+    padding: 12px;
+    border: none;
+}
+
+button.get-fixes:hover {
+    box-shadow: 4px 4px #90bef9;
 }

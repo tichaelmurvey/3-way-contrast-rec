@@ -1,13 +1,13 @@
 export default function testColors({changeColors, test, colors}){
     function inputChangeHandler(evt){
-      const test = evt.target.id;
-      console.log(test === "one");
+      if(/^#([0-9a-f]{3}){1,2}$/i.test(evt.target.value)){
       const newColors = [
         evt.target.id === "color-one" ? evt.target.value : colors[0],
         evt.target.id === "color-two" ? evt.target.value : colors[1],
         evt.target.id === "color-three" ? evt.target.value : colors[2],
       ]
       changeColors(newColors);
+    }
     }
     return (
     <div className="section colors">
