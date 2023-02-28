@@ -1,72 +1,96 @@
 import React, { useState } from "react";
 import getRecs from "../logic/recommend";
+import {ComponentPreview} from "./preview"
 
 export default function Fixes({test, colors}){
-    const [changeColors, setChangeColors] = useState([false, false, false]);
     const [results, setResults] = useState();
+    const [checked, setChecked] = useState([false, false, false]);
 
     function getResults(){
+      let colorInput = colors.slice(0,(test.colors.length))
       setResults(<Results 
-      changeColors={colors.filter(function(color, index){
-        return changeColors[index];
+      changeColors={colorInput.filter(function(color){
+        return checked[color.index];
       })}
       keepColors = {
-        colors.slice(0,(test.colors.length))
-        .filter(function(color, index){
-          return !changeColors[index];
+        colorInput.filter(function(color){
+          return !checked[color.index];
         })}
       ratio={test.ratio}
+      test = {test}
       />)
     }
-    function updateColors(index){
-      let copyChangeColors = [...changeColors];
-      copyChangeColors[index] = !copyChangeColors[index];
-      setChangeColors(copyChangeColors);
+    function updateChecked(index){
+      let copyChecked = [...checked];
+      copyChecked[index] = !copyChecked[index];
+      console.log(copyChecked);
+      setChecked(copyChecked);
     }
     return(
-    <div className="section fixes">
-        <h2>👩‍🏫 Recommend colours</h2>
-        <p>Choose which colours to change.</p>
-        {
-          [...Array(test.colors.length).keys()].map((item, index) => {
-            return <ColorSelector key={index} index={index} colors={colors} updateColors={updateColors}/>
-          })
-        }
-        <button className="get-fixes" onClick={getResults}>Recommend colors ></button>
-        {results}
-      </div>
+      <div className="section fixes">
+        <div className="fixesInput">
+          <h2>👩‍🏫 Recommend colours</h2>
+          <p>Choose which colours to change.</p>
+          {
+            [...Array(test.colors.length).keys()].map((item, index) => {
+              return <ColorSelector key={index} index={index} color={colors[index].color} test={test} updateChecked={updateChecked}/>
+            })
+          }
+          <button className="get-fixes" onClick={getResults}>Recommend colors ></button>
+          </div>
+          {results}
+        </div>
     )
 }
 
-function ColorSelector({index, colors, updateColors}){
+function ColorSelector({index, color, test, updateChecked}){
   function changeHandler(evt){
-    updateColors(index);
+    updateChecked(index);
   }
   return(
     <label htmlFor={"color-"+index+"-checkbox"} className="changeSelect">
     <input onChange={changeHandler} type="checkbox" id={"color-"+index+"-checkbox"} /> 
-    Color {index+1}
-    <div className="color-preview" style={{backgroundColor: colors[index]}} />
+    {test.colors[index]}
+    <div className="color-preview" style={{backgroundColor: color}} />
     </label>
   )
 }
 
-function Results({changeColors, keepColors, ratio}){
+function Results({changeColors, keepColors, ratio, test}){
   let recs = getRecs(changeColors, keepColors, ratio);
   console.log(recs);
+  let resultBlock;
+  if(typeof(recs) == "object"){
+    if(recs.length === 0){
+      return "No colors found";
+    } else {
+      resultBlock = recs.map((colorSet, index) => {
+        return <ResultContainer key={index} colorSet={colorSet} test={test}/>
+      })
+    }
+  } else {
+    resultBlock = recs
+  }
+
   return(
-    <div class="results">
-      {recs.map((color, index) => {
-        return <ResultContainer key={index} color={color}/>
-      })}
+    <div className="results">
+      {resultBlock}
     </div>
   )
 }
 
-function ResultContainer({color}){
+function ResultContainer({colorSet, test}){
+  console.log(colorSet);
+  const sortedColorSet = colorSet.sort((a,b) => a.index - b.index);
+  console.log(sortedColorSet);
   return(
-    <div class="result">
-      <p>{color.color}</p>
+    <div className="result">
+      <ComponentPreview test={test} colors={sortedColorSet.map(color => {return color.color})} />
+      {sortedColorSet.map(color => (
+        <div>
+              <p><div className="color-preview" style={{backgroundColor: color.color}} />{test.colors[color.index]}: {color.color} </p>
+            </div>
+      ))}
     </div>
   )
 }

@@ -205,6 +205,38 @@ svg {
 }
 
 /* FIXES */
+.fixes {
+    display: flex;
+}
+
+.fixesInput {
+    min-width: fit-content;
+}
+
+.results {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 30px;
+}
+
+.result {
+    font-size: 1rem;
+    border: 2px solid gray;
+    margin: 14px;
+    padding: 14px;
+}
+
+.result p{
+    display: flex;
+    align-items: center;
+}
+
+.result .color-preview {
+    height: 25px;
+    width: 25px;
+    display: inline-block;
+    margin-right: 12px;
+}
 
 .changeSelect {
     border: 1px solid black;
@@ -239,3 +271,4 @@ button.get-fixes {
 button.get-fixes:hover {
     box-shadow: 4px 4px #90bef9;
 }
+

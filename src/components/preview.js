@@ -4,14 +4,22 @@ export default function Preview({test, colors}){
     return(
         <div className="section preview">
             <h2>🖼️ How it looks</h2>
-            {test.testCase === "focused_button" && <FocusedButtonExample colors={colors}/>}
-            {test.testCase === "button" && <ButtonExample colors={colors}/>}
-            {test.testCase === "link" && <LinkExample colors={colors}/>}
-            {test.testCase === "text_regular" && <TextExample colors={colors}/>}
-            {test.testCase === "text_large" && <LargeTextExample colors={colors}/>}
-            {test.testCase === "neutral_2" && <TwoColorsExample colors={colors}/>}
-            {test.testCase === "neutral_3" && <ThreeColorsExample colors={colors}/>}
+            < ComponentPreview test={test} colors={colors} />
       </div>
+    )
+}
+
+export function ComponentPreview({test, colors}){
+    return(
+        <>
+        {test.testCase === "focused_button" && <FocusedButtonExample colors={colors}/>}
+        {test.testCase === "button" && <ButtonExample colors={colors}/>}
+        {test.testCase === "link" && <LinkExample colors={colors}/>}
+        {test.testCase === "text_regular" && <TextExample colors={colors}/>}
+        {test.testCase === "text_large" && <LargeTextExample colors={colors}/>}
+        {test.testCase === "neutral_2" && <TwoColorsExample colors={colors}/>}
+        {test.testCase === "neutral_3" && <ThreeColorsExample colors={colors}/>}
+        </>
     )
 }
 
