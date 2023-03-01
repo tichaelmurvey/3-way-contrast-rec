@@ -1,3 +1,4 @@
+import { within } from '@testing-library/react';
 import chroma from 'chroma-js';
 
 export default function getRecs(changeColors, keepColors, ratio){
@@ -12,43 +13,45 @@ export default function getRecs(changeColors, keepColors, ratio){
         return getSecondColor(keepColors[0], changeColors[0], ratio);
     } else if(keepColors.length == 1 && changeColors.length == 2){
         return getTwoColors(keepColors, changeColors, ratio);
-    } else if(keepColors.length == 0){
-        return changeEverything(keepColors, changeColors);
-    } else {
+    } else if(keepColors.length == 0 && changeColors.length == 2){
+        return changeEverythingTwo(changeColors, ratio);
+    } else if(keepColors.length == 0 && changeColors.length == 3){
+        return changeEverythingThree(changeColors, ratio);
+    }
+    else {
         return "No colours found";
     }
 }
 
 //======================Colour modifiers==============================
 //Modify an existing color to meet contrast with another color
-function getSecondColor (keepColor, changeColor, ratio) {
-    console.log("Running function getSecondColor");
-    console.log(keepColor, changeColor, ratio);
-    //Check whether ratio is compliant already
+function getSecondColor(keepColor, changeColor, ratio){
     keepColor.color = chroma(keepColor.color);
     changeColor.color = chroma(changeColor.color);
     if(chroma.contrast(keepColor.color, changeColor.color) >= ratio){
         return "compliant";
     }
+    
     //Get WCAG luminance for input color
     let initialLum = keepColor.color.luminance();
+    
     //Find luminances that are compliant
-    let compliantLums = secondLuminance(initialLum, ratio);
+    let compliantLums = Object.values(secondLuminance(initialLum, ratio)).filter(n => n);
+    
     //Modify the new color to meet the requirements
-    console.log("Got compliant luminances");
-    console.log(compliantLums);
-    let newColors = adjustColor(changeColor.color, compliantLums, ratio);
-    newColors.forEach(color => color.index = changeColor.index);
+    let newColors = changeOneColor(changeColor.color, compliantLums)
+    newColors = newColors.map(newColor =>{
+        return {color: newColor.hex(), index: changeColor.index}
+    });;
     keepColor.color = keepColor.color.hex();
+    //TODO: Check if any colours are the same
     return newColors.map(color => {return [color,keepColor]});
 }
 
-
 function getThirdColor(keepColors, changeColors, ratio){
-    console.log("Running function getThirdColor");
-    let keepOne = keepColors[0];
-    let keepTwo = keepColors[1];
-    let changeColor = changeColors[0];
+    let keepOne = {color: keepColors[0].color, index: keepColors[0].index};
+    let keepTwo = {color: keepColors[1].color, index: keepColors[1].index};
+    let changeColor = {color: changeColors[0].color, index: changeColors[0].index};
     keepOne.color = chroma(keepOne.color);
     keepTwo.color = chroma(keepTwo.color);
     changeColor.color = chroma(changeColor.color);
@@ -61,45 +64,192 @@ function getThirdColor(keepColors, changeColors, ratio){
     let keepOneLum = keepOne.color.luminance();
     let keepTwoLum = keepTwo.color.luminance();
     //Find luminances that are compliant
-    let compliantLums = thirdLuminance(keepOneLum, keepTwoLum, ratio);
+    let compliantLums = Object.values(thirdLuminance(keepOneLum, keepTwoLum, ratio)).filter(n => n);
     //Get a color for each of the compliant luminances
-    let newColors = adjustColor(changeColor.color, compliantLums, ratio);
-    newColors.forEach(color => color.index = changeColor.index);
+    let newColors = changeOneColor(changeColor.color, compliantLums);
+    newColors = newColors.map(newColor =>{
+        return {color: newColor.hex(), index: changeColor.index}
+    });;
     keepOne.color = keepOne.color.hex();
     keepTwo.color = keepTwo.color.hex();
+    //TODO: Check if any colours are the same
     return newColors.map(color => {return [color,keepOne,keepTwo]})
 }
 
 function getTwoColors(keepColors, changeColors, ratio){
-    //TODO: Get two colours using two more luminances
-    console.log("Running function getTwoColors");
-    let changeOne = changeColors[0];
-    let changeTwo = changeColors[1];
-    let keepColor = keepColors[0];
+    let changeOne = {color: changeColors[0].color, index: changeColors[0].index};
+    let changeTwo = {color: changeColors[1].color, index: changeColors[1].index};
+    let keepColor = {color: keepColors[0].color, index: keepColors[0].index};
     changeOne.color = chroma(changeOne.color);
     changeTwo.color = chroma(changeTwo.color);
     keepColor.color = chroma(keepColor.color);    
     if(ThreeWayChecker(keepColor.color, changeOne.color, changeTwo.color, ratio)){
         return "Compliant";
     }
+    let colors = [];
+    //Check for the possibility of changing just one colour
+    if(chroma.contrast(changeOne.color, keepColor.color) >= ratio){
+        colors = colors.concat(getThirdColor([changeColors[0], keepColors[0]], [changeColors[1]], ratio))
+    }
+    if(chroma.contrast(changeTwo.color, keepColor.color) >= ratio){
+        colors = colors.concat(getThirdColor([changeColors[1], keepColors[0]], [changeColors[0]], ratio))
+    }
+    console.log("colors from third color getting", colors);
     let keepLum = keepColor.color.luminance();
-    let compliantLums = twoMoreLuminances(keepLum, ratio);
+    let compliantLums = Object.values(twoMoreLuminances(keepLum, ratio)).filter(n => n);
     let changeLighter = changeOne.color.luminance() > changeTwo.color.luminance ? changeOne : changeTwo;
     let changeDarker = changeOne.color.luminance() > changeTwo.color.luminance ? changeTwo : changeOne;
-    let colors = adjustTwoColors(compliantLums, changeLighter, changeDarker);
-    colors.forEach(color => color.push({color: keepColor.color.hex(), index: keepColor.index}));
+    let darkerLums = compliantLums.map(lum => {
+        return lum.darker;
+    })
+    let lighterLums = compliantLums.map(lum => {
+        return lum.lighter;
+    })
+    let darkerColors = changeOneColor(changeDarker.color, darkerLums);
+    let lighterColors = changeOneColor(changeLighter.color, lighterLums);
+    console.log("darker and lighter colors", darkerColors, lighterColors);
+    // TODO: Filter duplicates and reduce total pull
+    darkerColors.forEach(darkColor => {
+        lighterColors.forEach(lightColor => {
+            colors.push([{color: darkColor.hex(), index: changeDarker.index},{color: lightColor.hex(), index: changeLighter.index}, {color: keepColor.color.hex(), index: keepColor.index}]);
+        })
+    })
     return colors;
 }
 
-function changeEverything(){
-    return "change everything";
+function changeEverythingTwo(changeColors, ratio){
+    let colors = [];
+    //Try change 1
+    
+    let colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
+    let colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
+    if(chroma.contrast(colour1passthrough.color, colour2passthrough.color) >= ratio){
+        return "compliant";
+    }
+    colors = colors.concat(getSecondColor(colour1passthrough, colour2passthrough, ratio))
+    //Try change the other
+    colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
+    colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
+    colors = colors.concat(getSecondColor(colour2passthrough, colour1passthrough, ratio))
+    //Try change both
+    colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
+    colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
+    //let compliantLums = Object.values(generateLumsTwo(chroma(colour1passthrough.color).luminance(), chroma(colour2passthrough.color).luminance(), ratio)).filter(n => n);
+    return colors;
+}
+
+function changeEverythingThree(changeColors, ratio){
+    let changeColorPassthrough = changeColors.map(useColor => {
+        return {color: chroma(useColor.color), index: useColor.index}
+    })
+    if(ThreeWayChecker(changeColorPassthrough[0].color, changeColorPassthrough[1].color, changeColorPassthrough[2].color, ratio)){
+        return "Compliant";
+    }
+    let colors = [];
+    //If any two colours match, try changing the other one
+    if(chroma.contrast(changeColorPassthrough[0].color, changeColorPassthrough[1].color) >= ratio){
+        console.log("Some colours are compliant!")
+        colors=colors.concat(getThirdColor([changeColorPassthrough[0], changeColorPassthrough[1]], [changeColorPassthrough[2]], ratio))
+    }
+    if(chroma.contrast(changeColorPassthrough[0].color, changeColorPassthrough[2].color) >= ratio){
+        console.log("Some colours are compliant!")
+        colors=colors.concat(getThirdColor([changeColorPassthrough[0], changeColorPassthrough[2]], [changeColorPassthrough[1]], ratio))
+    }
+    if(chroma.contrast(changeColorPassthrough[2].color, changeColorPassthrough[1].color) >= ratio){
+        console.log("Some colours are compliant!")
+        colors=colors.concat(getThirdColor([changeColorPassthrough[2], changeColorPassthrough[1]], [changeColorPassthrough[0]], ratio))
+    }
+    //Try keeping each colour and changing the other two
+    colors = colors.concat(getTwoColors([changeColorPassthrough[0]], [changeColorPassthrough[1], changeColorPassthrough[2]], ratio));
+    colors = colors.concat(getTwoColors([changeColorPassthrough[1]], [changeColorPassthrough[2], changeColorPassthrough[0]], ratio));
+    colors = colors.concat(getTwoColors([changeColorPassthrough[2]], [changeColorPassthrough[1], changeColorPassthrough[0]], ratio));
+    return colors;
+}
+
+// COLOR ADJUSTMENT
+
+function changeOneColor(baseColor, compliantLums){
+    let baseColors = [baseColor];
+    let returnColors = [];
+    //Filter compliant lums to remove very similar options
+    let buffer = 0.1;
+    let reducedLums = [];
+    for(let i=0; i<compliantLums.length; i++){
+        let min = compliantLums[i] - buffer;
+        let max = compliantLums[i] + buffer;
+        if(reducedLums.filter(lum2 => {return(lum2 >= min && lum2 <= max)}).length === 0){
+            reducedLums.push(compliantLums[i]);
+        }
+    }
+    compliantLums = reducedLums;
+    let greyScale = baseColors.filter(color => {
+        return color.lch()[1] < 1
+    })
+    if(greyScale.length > 0){
+        baseColors = baseColors.concat(liftChroma(greyScale, 2, 30));
+        baseColors = baseColors.concat(addHues(baseColors, 4, 40));
+    } else {
+        if(compliantLums.length*baseColors.length < 2){
+            baseColors = baseColors.concat(addHues(baseColors, 6, 20));
+        } else if(compliantLums.length*baseColors.length < 4){
+            baseColors = baseColors.concat(addHues(baseColors, 4, 20));
+        } else if(compliantLums.length*baseColors.length < 10){
+            baseColors = baseColors.concat(addHues(baseColors, 2, 20));
+        }
+    }
+    baseColors.forEach(baseColor => {
+        returnColors = returnColors.concat(generateFromLuminosity(baseColor, compliantLums));
+    })
+    return returnColors;
+}
+
+function liftChroma(baseColors, count, spread){
+    let colors = [];
+    baseColors.forEach(color => {
+        for(let i=0;i<count;i++){
+            let newColor = color.lch();
+            newColor[1] += spread*(i+1);
+            colors.push(chroma(newColor, "lch"));
+        }
+    })  
+    return colors;
+}
+//Add some hue variety
+function addHues(baseColors, count, spread){
+    let colors=[];
+    baseColors.forEach((baseColor)=>{
+        for(let i=0;i<count;i++){
+            let newColor = baseColor.lch()
+            if(i < count/2){
+                newColor[2] -= (i+1)*spread
+            } else {
+                newColor[2] += (i+1-count/2)*spread
+            }
+            colors.push(chroma(newColor, 'lch'));
+        }
+    })
+    return colors;
+}
+
+//Alter a given color so that it matches a luminance. Includes provisions to ensure if it needs to beat a certain ratio, it overshoots/undershoots the luminosity accordingly. This helps avoid rounding errors.
+function generateFromLuminosity(baseColor, compliantLums){
+    let colors=[];
+    //Interpolation with white/black
+    compliantLums.forEach(lum =>{
+        // let interpolateAdjust = baseColor.luminance(lum);
+        //newColor = tweak(newColor, baseColor, ratio, "rgb");
+        // colors.push(interpolateAdjust);
+        let lightnessAdjust = adjustLightnessBetween(baseColor, lum, lum-0.1, lum+0.1)
+        colors.push(lightnessAdjust);
+
+    })
+    return colors;    
 }
 
 // LUMINANCE CALCULATIONS
 
 //Find a set of second luminances that work with a given luminance
 function secondLuminance (oldLuminance, desired_ratio) {
-    console.log("Running function secondLuminance");
     let options = {
         darkOption: null,
         lightOption: null
@@ -117,11 +267,8 @@ function secondLuminance (oldLuminance, desired_ratio) {
 
 //Calculate compliant luminance for two other luminances (which don't necessarily contrast) at a given ratio
 function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
-    console.log("Running function thirdLuminance");
     var brightest = Math.max(first_luminance, second_luminance);
     var darkest = Math.min(first_luminance, second_luminance);
-    console.log("darkest: "+ darkest)
-    console.log("brightest: "+ brightest)
     let options = {
         underBoth: null,
         aboveBoth: null,
@@ -131,18 +278,11 @@ function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
     };
     //Middle
     if (getRatio(darkest, brightest) > desired_ratio) {
-        console.log("space between lums:")
-        console.log(getRatio(darkest, brightest))
-        console.log("finding middle")
         //Get luminance that is compliant with the darkest stable colour
         let middleDarker = secondLuminance(darkest, desired_ratio).lightOption;
-        console.log("middle darker:")
-        console.log(middleDarker)
 
         //Get luminance that is compliant with the lightest stable colour
         let middleLighter = secondLuminance(brightest, desired_ratio).darkOption;
-        console.log("middle lighter:")
-        console.log(middleLighter)
 
         //Get luminance that is exactly between the lightest and darkest stable colours
         let trueMiddle = (middleDarker + middleLighter) / 2;
@@ -150,17 +290,9 @@ function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
         //Check that new luminances are compliant with both existing stable luminances
         if (getRatio(middleDarker, brightest) >= desired_ratio) {
             options.middleDarker = middleDarker;
-            console.log("Darker middle: " + middleDarker);
-        } else {
-            console.log("failed middleDarker with a contrast of")
-            console.log(getRatio(middleDarker, brightest))
         }
         if (getRatio(middleLighter, darkest) >= desired_ratio) {
             options.middleLighter = middleLighter;
-            console.log("Lighter middle option: " + middleLighter);
-        } else {
-            console.log("failed middleLighter with a contrast of")
-            console.log(getRatio(middleLighter, darkest))
         }
         if ((getRatio(trueMiddle, darkest) >= desired_ratio) && (getRatio(trueMiddle, brightest) >= desired_ratio)) {
             options.trueMiddle = trueMiddle;
@@ -183,7 +315,6 @@ function thirdLuminance (first_luminance, second_luminance, desired_ratio) {
 
 //Calculate two luminances which match a given luminance, and each other
 function twoMoreLuminances(oldLuminance, desired_ratio){
-    console.log("Running function twoMoreLuminances");
     let options = {
         bothBelow: null,
         bothAbove: null,
@@ -208,224 +339,60 @@ function twoMoreLuminances(oldLuminance, desired_ratio){
     return(options);
 }
 
+//Generate luminances from scratch for change all cases
+function generateLumsTwo(color1, color2, ratio){
+    console.log(color1, color2, ratio);
+    let compliantLums = []
+    //Start with black
+    compliantLums = compliantLums.concat(secondLuminance(0, ratio));
+    //Start with white
+    compliantLums = compliantLums.concat(secondLuminance(1, ratio));
+    //Use average
+    let averageLum = (color1 + color2)/2;
+    let averageOptions = secondLuminance(averageLum, ratio/2);
+    if(averageOptions.lightOption){
+        compliantLums = compliantLums.concat(secondLuminance(averageOptions.lightOption, ratio));
+    } if (averageOptions.darkOption){
+        compliantLums = compliantLums.concat(secondLuminance(averageOptions.darkOption, ratio));
+    }
+
+    return compliantLums;
+}
+
 //Gets contrast ratio between two relative luminosities
 function getRatio (lum1, lum2) {
-    console.log("Running function getRatio");
     var brightest = Math.max(lum1, lum2);
     var darkest = Math.min(lum1, lum2);
-    console.log((brightest + 0.05) / (darkest + 0.05));
     return ((brightest + 0.05) / (darkest + 0.05));
-}
-
-// COLOR ADJUSTMENT
-
-//Add some hue variety
-function adjustColor(baseColor, compliantLums){
-    let colors = [];
-    if(baseColor.lch()[1] > 20){
-        let spread = 4;
-        for(let i=0;i<spread;i++){
-            let newColor = baseColor.lch()
-            newColor[2] -= (spread-2*i)*15
-            colors = colors.concat(adjustOneColor(chroma(newColor, 'lch'), compliantLums));
-        }    
-    } else {
-        colors = adjustOneColor(baseColor, compliantLums);
-    }
-    return colors;
-}
-
-function changeOneColor(baseColor, compliantLums){
-    let baseColors = [baseColor];
-    baseColors = baseColors.concat(
-        liftChroma(
-            baseColors.filter(color => {
-                return color.lch()[1] < 10
-            }
-            ), 3, 10))
-    baseColors.forEach(color => {
-        if(color.lch()[1] < 10){
-            liftChroma()
-        }
-    })
-}
-
-function liftChroma(baseColors, count, spread){
-    let colors = [];
-    baseColors.forEach(color =>{
-        for(let i=0;i<count;i++){
-            let newColor = color.lch();
-            newColor[1] += spread*(i+1);
-            colors.push(newColor);
-        }
-    })  
-    return colors;
-}
-
-function addHues(baseColors, count, spread){
-    let colors=[];
-    baseColors.forEach(()=>{
-        for(let i=0;i<count;i++){
-            let newColor = baseColors[i].lch()
-            newColor[2] -= (count-2*i)*spread
-            colors.push(chroma(newColor, 'lch'));
-        }
-    })
-    return colors;
-}
-
-//Alter a given color so that it matches a luminance. Includes provisions to ensure if it needs to beat a certain ratio, it overshoots/undershoots the luminosity accordingly. This helps avoid rounding errors.
-function generateFromLuminosity(baseColor, compliantLums){
-    let colors=[];
-    //Interpolation with white/black
-    for (var lum in compliantLums) {
-        if(compliantLums[lum]) {
-            let interpolateAdjust = {color: baseColor.luminance(compliantLums[lum]).hex()};
-            //newColor = tweak(newColor, baseColor, ratio, "rgb");
-            colors.push(interpolateAdjust);
-            let lightnessAdjust = {color: adjustLightnessBetween(baseColor, lum, lum-1, lum+1)}
-            colors.push(lightnessAdjust);
-        }
-    }
-    return colors;    
-}
-
-function adjustOneColor (baseColor, compliantLums) {
-    console.log("Running function adjustColor");
-    let colors = [];
-    //Basic white interpolation option
-    for (var lum in compliantLums) {
-        if(compliantLums[lum]) {
-            let newColor = {changeMethod: "interpolation", color: baseColor.luminance(compliantLums[lum]).hex()};
-            //newColor = tweak(newColor, baseColor, ratio, "rgb");
-            colors.push(newColor);
-        }
-    }
-    if(baseColor.lch()[1] > 10){
-            //Simple light or dark
-        for (var lumtype in compliantLums) {
-            if(compliantLums[lumtype]) {
-                if(lumtype === 'darkOption' || lumtype === 'underBoth'){
-                    colors.push({type: "lch lightness decreased", color: adjustLightnessDown(baseColor, compliantLums[lumtype]).hex()});
-                }
-                if(lumtype === 'lightOption' || lumtype === 'aboveBoth'){
-                    colors.push({changeMethod: "lch lightness increased", color: adjustLightnessUp(baseColor, compliantLums[lumtype]).hex()});
-                }
-            }
-        }
-        //Middle options
-        if(compliantLums.trueMiddle){
-            let newColor = adjustLightnessBetween(baseColor, compliantLums.trueMiddle, compliantLums.middleDarker, compliantLums.middleLighter);
-            colors.push({changeMethod: 'lch true middle', color: newColor.hex()});
-        }
-        
-        if(compliantLums.middleDarker){
-            let newColor = adjustLightnessBetween(baseColor, compliantLums.middleDarker, compliantLums.middleDarker, compliantLums.trueMiddle);
-            colors.push({type: 'lch middle darker', color: newColor.hex()});
-        }
-
-        if(compliantLums.middleLighter){
-            let newColor = adjustLightnessBetween(baseColor, compliantLums.middleLighter, compliantLums.trueMiddle, compliantLums.middleLighter);
-            colors.push({type: 'lch middle lighter', color: newColor.hex()});
-        }
-}
-    return colors;
-}
-
-function adjustTwoColors(compliantLums, lighterColor, darkerColor){
-    let colorSets = [];
-    for (var option in compliantLums) {
-        if(compliantLums[option]) {
-            let lighter = {index: lighterColor.index, color: lighterColor.color.luminance(compliantLums[option].lighter).hex()};
-            let darker = {index: darkerColor.index, color: darkerColor.color.luminance(compliantLums[option].darker).hex()};
-            colorSets.push([lighter, darker]);
-        }
-    }
-    // //Simple light or dark
-    // for (var option in compliantLums) {
-    //     if(compliantLums[option]) {
-    //         if(lumtype === 'darkOption' || lumtype === 'underBoth'){
-    //             colors.push({type: "lch lightness decreased", color: adjustLightnessDown(baseColor, compliantLums[lumtype]).hex()});
-    //         }
-    //         if(lumtype === 'lightOption' || lumtype === 'aboveBoth'){
-    //             colors.push({changeMethod: "lch lightness increased", color: adjustLightnessUp(baseColor, compliantLums[lumtype]).hex()});
-    //         }
-    //     }
-    // }
-    return(colorSets);
 }
 
 
 //======================Colour adjustment calculators===========================
 //Adjust the lch lightness of a colour until it meets the required luminance
-function adjustLightnessUp(initial_color, target_luminance){
-    console.log("Running function adjustLightnessUp");
-    //Check colour for compliance
-    let working_color = initial_color.lch();
-    working_color[1] = 130;
-    for(let i = 0;i<100;i++){
-        let test_color = chroma(working_color, 'lch');
-        if(test_color.luminance() >= target_luminance){
-            return(test_color);
-        }
-        working_color[0] += 1;
-    }
-    return 'no color found';
-}
-
-function adjustLightnessDown(initial_color, target_luminance){
-    console.log("Running function adjustLightnessDown");
-    //Check colour for compliance
-    let working_color = initial_color.lch();
-    //working_color[1] = 130;
-    for(let i = 0;i<100;i++){
-        let test_color = chroma(working_color, 'lch');
-        if(test_color.luminance() <= target_luminance){
-            return(test_color);
-        }
-        working_color[0] -= 1;
-    }
-    return 'no color found';
-}
 
 function adjustLightnessBetween(initial_color, target_luminance, lower_luminance, upper_luminance) {
-    console.log("Running function adjustLightnessBetween");
     let working_color = initial_color.lch();
-    console.log(working_color);
-    console.log("target lum: "+target_luminance);
-    console.log("lower lum: "+lower_luminance);
-    console.log("upper lum: "+upper_luminance);
-    
     //Generate all possible colours across the lightness spectrum with a granularity of 0.01
-    let spectrum = Array.from(Array(1010).keys())
+    let spectrum = Array.from(Array(1510).keys())
     spectrum = spectrum.map(function(pos){
         return [pos/10, working_color[1], working_color[2]]
     });
     //Filter to just those with a luminosity within bounds
     let within_bounds = spectrum.filter( function(colour){
         let test_color = chroma(colour, 'lch');
-        // console.log(test_color);
-        // console.log(test_color.luminance());
-        // console.log(test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance);
         return test_color.luminance() >= lower_luminance && test_color.luminance() <= upper_luminance;
-
     });
-    console.log("within bounds:")
-    console.log(within_bounds);
-
     //Find the colour closest to the target
-    let final_colour = within_bounds[0]
-    let old_distance = Math.abs(chroma(within_bounds[0], 'lch').luminance(), target_luminance);
-    within_bounds.forEach(function(colour){
-        let distance = Math.abs(target_luminance - chroma(colour, 'lch').luminance());
+    let final_color = within_bounds[0];
+    let old_distance = Math.abs(target_luminance -chroma(within_bounds[0], 'lch').luminance());
+    within_bounds.forEach(function(color){
+        let distance = Math.abs(target_luminance - chroma(color, 'lch').luminance());
         if(distance < old_distance){
             old_distance = distance;
-            final_colour = colour;
+            final_color = color;
         }
     });
-    console.log("final colour:")
-    console.log(final_colour);
-    return chroma(final_colour, 'lch');
+    return chroma(final_color, 'lch');
 }
 
 function ThreeWayChecker(color1, color2, color3, ratio){

@@ -80,9 +80,7 @@ function Results({changeColors, keepColors, ratio, test}){
 }
 
 function ResultContainer({colorSet, test}){
-  console.log(colorSet);
   const sortedColorSet = colorSet.sort((a,b) => a.index - b.index);
-  console.log(sortedColorSet);
   return(
     <div className="result">
       <ComponentPreview test={test} colors={sortedColorSet.map(color => {return color.color})} />
