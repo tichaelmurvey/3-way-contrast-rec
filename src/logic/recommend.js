@@ -1,10 +1,20 @@
 import { within } from '@testing-library/react';
 import chroma from 'chroma-js';
 
-export default function getRecs(changeColors, keepColors, ratio){
+export default function getRecs(changeColors, keepColors, ratio, numRecs){
     ratio = ratio+0.02;
     console.log("Running function getRecs");
     console.log(changeColors, keepColors, ratio);
+    let recOutput = recSorter(changeColors, keepColors, ratio);
+    let filterThreshold = 40;
+    while(recOutput >= numRecs){
+        let recOutput = filterSimilarColorsets(recOutput, filterThreshold);
+        filterThreshold -=1;
+    }
+    return recOutput;
+}
+
+function recSorter(changeColors, keepColors, ratio){
     if(changeColors.length == 0){
         return("No change color selected");
     } else if(keepColors.length == 2){
@@ -401,4 +411,23 @@ function ThreeWayChecker(color1, color2, color3, ratio){
         && chroma.contrast(color2, color3) >= ratio
         && chroma.contrast(color1, color3) >= ratio
     )
+}
+
+export function filterSimilarColorsets(colorSets, matchBuffer){
+    colorSets = colorSets.map(colorSet =>{
+        return colorSet.sort((a,b) => a.index - b.index);
+    })
+    console.log(colorSets);
+    let filteredColorSets = colorSets.filter((colorSet, index, colorSets) => {
+        let sameColor = colorSets.find((checkColorSet) => {
+            return chroma.deltaE(colorSet[0].color, checkColorSet[0].color) < matchBuffer && chroma.deltaE(colorSet[1].color, checkColorSet[1].color) < matchBuffer && chroma.deltaE(colorSet[2].color, checkColorSet[2].color) < matchBuffer
+        });
+        console.log("matching colors", colorSet, sameColor);
+        if(colorSets.indexOf(sameColor) === index){
+            return colorSet;
+        } else {
+            console.log("Rejected a similar color");
+        }
+    })
+    return filteredColorSets;
 }

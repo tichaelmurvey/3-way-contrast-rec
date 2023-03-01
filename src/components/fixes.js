@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import getRecs from "../logic/recommend";
 import {ComponentPreview} from "./preview"
+import {filterSimilarColorsets} from "../logic/recommend"
 
 export default function Fixes({test, colors}){
     const [results, setResults] = useState();
@@ -57,8 +58,7 @@ function ColorSelector({index, color, test, updateChecked}){
 }
 
 function Results({changeColors, keepColors, ratio, test}){
-  let recs = getRecs(changeColors, keepColors, ratio);
-  console.log(recs);
+  let recs = getRecs(changeColors, keepColors, ratio, 20);
   let resultBlock;
   if(typeof(recs) == "object"){
     if(recs.length === 0){
@@ -80,11 +80,10 @@ function Results({changeColors, keepColors, ratio, test}){
 }
 
 function ResultContainer({colorSet, test}){
-  const sortedColorSet = colorSet.sort((a,b) => a.index - b.index);
   return(
     <div className="result">
-      <ComponentPreview test={test} colors={sortedColorSet.map(color => {return color.color})} />
-      {sortedColorSet.map(color => (
+      <ComponentPreview test={test} colors={colorSet.map(color => {return color.color})} />
+      {colorSet.map(color => (
         <div>
               <p><div className="color-preview" style={{backgroundColor: color.color}} />{test.colors[color.index]}: {color.color} </p>
             </div>
