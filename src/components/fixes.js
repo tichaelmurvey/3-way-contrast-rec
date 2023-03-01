@@ -58,7 +58,7 @@ function ColorSelector({index, color, test, updateChecked}){
 }
 
 function Results({changeColors, keepColors, ratio, test}){
-  let recs = getRecs(changeColors, keepColors, ratio, 20);
+  let recs = getRecs(changeColors, keepColors, ratio, 3);
   let resultBlock;
   if(typeof(recs) == "object"){
     if(recs.length === 0){
@@ -73,8 +73,11 @@ function Results({changeColors, keepColors, ratio, test}){
   }
 
   return(
-    <div className="results">
-      {resultBlock}
+    <div className = "reusltsContainer">
+      <div className="results">
+        {resultBlock}
+      </div>
+      <button className="get-fixes" style={{marginLeft: " 40px"}}>See more</button>
     </div>
   )
 }

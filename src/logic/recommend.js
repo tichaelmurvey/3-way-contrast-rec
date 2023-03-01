@@ -6,13 +6,17 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
     console.log("Running function getRecs");
     console.log(changeColors, keepColors, ratio);
     let recOutput = recSorter(changeColors, keepColors, ratio);
+    recOutput = sortColors(recOutput);
     console.log(recOutput);
-    let filterThreshold = 1;
-    while(recOutput.length >= numRecs){
-        recOutput = filterSimilarColorsets(recOutput, filterThreshold);
-        filterThreshold +=3 ;
-        console.log("filterthreshold", filterThreshold)
-        console.log("length and recs", recOutput.length, numRecs);
+    if(typeof(recOutput) === "object"){
+        let filterThreshold = 1;
+        while(recOutput.length > numRecs){
+            recOutput = filterSimilarColorsets(recOutput, filterThreshold);
+            filterThreshold +=1 ;
+            console.log("filterthreshold", filterThreshold)
+            console.log("length and recs", recOutput.length, numRecs);
+        }
+        console.log(recOutput);    
     }
     return recOutput;
 }
@@ -414,16 +418,26 @@ function ThreeWayChecker(color1, color2, color3, ratio){
 }
 
 export function filterSimilarColorsets(colorSets, matchBuffer){
-    colorSets = colorSets.map(colorSet =>{
-        return colorSet.sort((a,b) => a.index - b.index);
-    })
     let filteredColorSets = colorSets.filter((colorSet, index, colorSets) => {
         let sameColor = colorSets.find((checkColorSet) => {
-            return chroma.deltaE(colorSet[0].color, checkColorSet[0].color) < matchBuffer && chroma.deltaE(colorSet[1].color, checkColorSet[1].color) < matchBuffer && chroma.deltaE(colorSet[2].color, checkColorSet[2].color) < matchBuffer
+            return checkColorSet.every((color, colorIndex) => {
+                return chroma.deltaE(color.color, colorSet[colorIndex].color) < matchBuffer;
+            })
         });
         if(colorSets.indexOf(sameColor) === index){
             return colorSet;
         } 
     })
     return filteredColorSets;
+}
+
+function sortColors(colorSets){
+    console.log(colorSets);
+    return colorSets.map(colorSet =>{
+        return colorSet.sort((a,b) => a.index - b.index);
+    })
+}
+
+function checkMatch(color1, color2, matchBuffer){
+    return chroma.deltaE(color1, color2) < matchBuffer;
 }
