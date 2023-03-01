@@ -6,10 +6,13 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
     console.log("Running function getRecs");
     console.log(changeColors, keepColors, ratio);
     let recOutput = recSorter(changeColors, keepColors, ratio);
-    let filterThreshold = 40;
-    while(recOutput >= numRecs){
-        let recOutput = filterSimilarColorsets(recOutput, filterThreshold);
-        filterThreshold -=1;
+    console.log(recOutput);
+    let filterThreshold = 1;
+    while(recOutput.length >= numRecs){
+        recOutput = filterSimilarColorsets(recOutput, filterThreshold);
+        filterThreshold +=3 ;
+        console.log("filterthreshold", filterThreshold)
+        console.log("length and recs", recOutput.length, numRecs);
     }
     return recOutput;
 }
@@ -104,7 +107,6 @@ function getTwoColors(keepColors, changeColors, ratio){
     if(chroma.contrast(changeTwo.color, keepColor.color) >= ratio){
         colors = colors.concat(getThirdColor([changeColors[1], keepColors[0]], [changeColors[0]], ratio))
     }
-    console.log("colors from third color getting", colors);
     let keepLum = keepColor.color.luminance();
     let compliantLums = Object.values(twoMoreLuminances(keepLum, ratio)).filter(n => n);
     let changeLighter = changeOne.color.luminance() > changeTwo.color.luminance ? changeOne : changeTwo;
@@ -117,8 +119,6 @@ function getTwoColors(keepColors, changeColors, ratio){
     })
     let darkerColors = changeOneColor(changeDarker.color, darkerLums);
     let lighterColors = changeOneColor(changeLighter.color, lighterLums);
-    console.log("darker and lighter colors", darkerColors, lighterColors);
-    // TODO: Filter duplicates and reduce total pull
     darkerColors.forEach(darkColor => {
         lighterColors.forEach(lightColor => {
             colors.push([{color: darkColor.hex(), index: changeDarker.index},{color: lightColor.hex(), index: changeLighter.index}, {color: keepColor.color.hex(), index: keepColor.index}]);
@@ -417,17 +417,13 @@ export function filterSimilarColorsets(colorSets, matchBuffer){
     colorSets = colorSets.map(colorSet =>{
         return colorSet.sort((a,b) => a.index - b.index);
     })
-    console.log(colorSets);
     let filteredColorSets = colorSets.filter((colorSet, index, colorSets) => {
         let sameColor = colorSets.find((checkColorSet) => {
             return chroma.deltaE(colorSet[0].color, checkColorSet[0].color) < matchBuffer && chroma.deltaE(colorSet[1].color, checkColorSet[1].color) < matchBuffer && chroma.deltaE(colorSet[2].color, checkColorSet[2].color) < matchBuffer
         });
-        console.log("matching colors", colorSet, sameColor);
         if(colorSets.indexOf(sameColor) === index){
             return colorSet;
-        } else {
-            console.log("Rejected a similar color");
-        }
+        } 
     })
     return filteredColorSets;
 }
