@@ -308,3 +308,8 @@ button.get-fixes:hover {
 button.see-more{
     margin-left: 12px;
 }
+
+.failedMessage {
+    font-weight: 600;
+    align-self: center;
+}

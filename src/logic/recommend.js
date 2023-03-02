@@ -1,14 +1,15 @@
 import { within } from '@testing-library/react';
 import chroma from 'chroma-js';
+let compliantMessage = "These colours are already compliant at this contrast ratio."
 
 export default function getRecs(changeColors, keepColors, ratio, numRecs){
     ratio = ratio+0.02;
     console.log("Running function getRecs");
     console.log(changeColors, keepColors, ratio);
     let recOutput = recSorter(changeColors, keepColors, ratio);
-    recOutput = sortColors(recOutput);
-    console.log(recOutput);
     if(typeof(recOutput) === "object"){
+        recOutput = sortColors(recOutput);
+        console.log(recOutput);    
         let filterThreshold = 1;
         while(recOutput.length > numRecs){
             recOutput = filterSimilarColorsets(recOutput, filterThreshold);
@@ -23,7 +24,7 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
 
 function recSorter(changeColors, keepColors, ratio){
     if(changeColors.length == 0){
-        return("No change color selected");
+        return("Select one or more colours to change.");
     } else if(keepColors.length == 2){
         return getThirdColor(keepColors, changeColors, ratio);
     } else if(changeColors.length === 1 && keepColors.length === 1){
@@ -46,7 +47,7 @@ function getSecondColor(keepColor, changeColor, ratio){
     keepColor.color = chroma(keepColor.color);
     changeColor.color = chroma(changeColor.color);
     if(chroma.contrast(keepColor.color, changeColor.color) >= ratio){
-        return "compliant";
+        return compliantMessage;
     }
     
     //Get WCAG luminance for input color
@@ -73,10 +74,10 @@ function getThirdColor(keepColors, changeColors, ratio){
     keepTwo.color = chroma(keepTwo.color);
     changeColor.color = chroma(changeColor.color);
     if(ThreeWayChecker(keepOne.color, keepTwo.color, changeColor.color, ratio)){
-        return "Compliant";
+        return compliantMessage;
     }
     if(chroma.contrast(keepOne.color, keepTwo.color) < ratio){
-        return "No possible result, other two colors are not compliant";
+        return ("Color " + (keepOne.index+1) + " and Color " + (keepTwo.index+1) + " are not compliant with each other. Choose one of those colours to change.");
     }
     let keepOneLum = keepOne.color.luminance();
     let keepTwoLum = keepTwo.color.luminance();
@@ -101,7 +102,7 @@ function getTwoColors(keepColors, changeColors, ratio){
     changeTwo.color = chroma(changeTwo.color);
     keepColor.color = chroma(keepColor.color);    
     if(ThreeWayChecker(keepColor.color, changeOne.color, changeTwo.color, ratio)){
-        return "Compliant";
+        return compliantMessage;
     }
     let colors = [];
     //Check for the possibility of changing just one colour
@@ -138,7 +139,7 @@ function changeEverythingTwo(changeColors, ratio){
     let colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
     let colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
     if(chroma.contrast(colour1passthrough.color, colour2passthrough.color) >= ratio){
-        return "compliant";
+        return compliantMessage;
     }
     colors = colors.concat(getSecondColor(colour1passthrough, colour2passthrough, ratio))
     //Try change the other
@@ -157,7 +158,7 @@ function changeEverythingThree(changeColors, ratio){
         return {color: chroma(useColor.color), index: useColor.index}
     })
     if(ThreeWayChecker(changeColorPassthrough[0].color, changeColorPassthrough[1].color, changeColorPassthrough[2].color, ratio)){
-        return "Compliant";
+        return compliantMessage;
     }
     let colors = [];
     //If any two colours match, try changing the other one
