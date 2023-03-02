@@ -92,10 +92,10 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
       return numColors < 20 ?
       <button onClick={()=>{
         setNumColors(20);
-      }} className="get-fixes" style={{marginLeft: " 40px"}}>See more</button>
+      }} className="get-fixes see-more" >See more</button>
       :  <button onClick={()=>{
         setNumColors(4);
-      }} className="get-fixes" style={{marginLeft: " 40px"}}>See less</button>
+      }} className="get-fixes see-more" >See less</button>
     }
   return(
     <>    

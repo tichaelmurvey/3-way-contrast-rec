@@ -165,6 +165,7 @@ input[type="radio"] {
     font-weight: 400;
     padding: 12px;
     border-radius: 6px;
+    width: 100%;
 }
 
 .passfail.pass {
@@ -229,19 +230,27 @@ svg {
 /* FIXES */
 .fixes {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .fixesInput {
     min-width: fit-content;
+    margin-right: 30px;
+}
+
+.resultsContainer {
+    max-width: fit-content;
+    flex: 1 1 10rem;
+
 }
 
 .results {
     display: flex;
     flex-wrap: wrap;
-    margin-left: 30px;
 }
 
 .result {
+    min-width: max-content;
     font-size: 1rem;
     border: 2px solid gray;
     margin: 14px;
@@ -294,3 +303,6 @@ button.get-fixes:hover {
     box-shadow: 4px 4px #90bef9;
 }
 
+button.see-more{
+    margin-left: 12px;
+}
