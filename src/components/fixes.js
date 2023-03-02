@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import getRecs from "../logic/recommend";
 import {ComponentPreview} from "./preview"
-import {filterSimilarColorsets} from "../logic/recommend"
 
 export default function Fixes({test, colors}){
     const [results, setResults] = useState();
