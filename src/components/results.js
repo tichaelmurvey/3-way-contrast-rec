@@ -12,7 +12,7 @@ export default function Results({test, colors}){
       console.log(compliant);
     }
     return(          
-    <div className="section results">
+    <div className="section testResults">
     <h2>📝 Results</h2>
       <p className={compliant ? "passfail pass" : "passfail fail"}>
       These colours {compliant ? "meet" : "do not meet"} contrast requirements.
