@@ -58,42 +58,52 @@ function ColorSelector({index, color, test, updateChecked}){
 
 function Results({changeColors, keepColors, ratio, test}){
   let [NumColors, setNumColors] = useState(4);
+  let resultBlock = <ResultBlock changeColors={changeColors} keepColors={keepColors} ratio={ratio} test={test} numColors={NumColors} setNumColors={setNumColors} />
   return(
     <div className = "resultsContainer">
-      <div className="results">
-        <ResultBlock changeColors={changeColors} keepColors={keepColors} ratio={ratio} test={test} numColors={NumColors} />
-      </div>
-      {NumColors < 20 ?
+        {resultBlock}
+      {console.log("resultblock", resultBlock)}
+    </div>
+  )
+}
+
+function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumColors}){
+  let isMessage = false;
+  let moreButton;
+  function renderResults(changeColors, keepColors, ratio, test, numColors){
+    let recs = getRecs(changeColors, keepColors, ratio, numColors);
+    if(typeof(recs) == "object"){
+      if(recs.length === 0){
+        isMessage = true;
+        return "No colors found";
+      } else {
+        isMessage = false;
+        return recs.map((colorSet, index) => {
+          return <ResultContainer key={index} colorSet={colorSet} test={test}/>
+        });
+      }
+    } else {
+      isMessage = true;
+       return recs;
+    }
+  }
+
+  function getButton(){
+      return numColors < 20 ?
       <button onClick={()=>{
         setNumColors(20);
       }} className="get-fixes" style={{marginLeft: " 40px"}}>See more</button>
       :  <button onClick={()=>{
         setNumColors(4);
       }} className="get-fixes" style={{marginLeft: " 40px"}}>See less</button>
-
-      }
-    </div>
-  )
-}
-
-function ResultBlock({changeColors, keepColors, ratio, test, numColors}){
-  function renderResults(changeColors, keepColors, ratio, test, numColors){
-    let recs = getRecs(changeColors, keepColors, ratio, numColors);
-    if(typeof(recs) == "object"){
-      if(recs.length === 0){
-        return "No colors found";
-      } else {
-        return recs.map((colorSet, index) => {
-          return <ResultContainer key={index} colorSet={colorSet} test={test}/>
-        });
-      }
-    } else {
-       return recs;
     }
-  }
   return(
     <>    
+          <div className="results">
+
       {renderResults(changeColors, keepColors, ratio, test, numColors)}
+      </div>
+    {!isMessage && getButton()}
     </>
   )
 }

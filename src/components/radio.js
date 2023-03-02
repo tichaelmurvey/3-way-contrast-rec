@@ -4,7 +4,7 @@ export default function radio(props){
     }
     return(
     <div>
-        <label htmlFor={props.testCase}> <input type="radio" defaultChecked={props.testCase === "focused_button"} onClick={clickHandler} id={props.testCase} name="example" />{props.title}</label>
+        <label htmlFor={props.testCase}> <input type="radio" defaultChecked={props.testCase === "text_regular"} onClick={clickHandler} id={props.testCase} name="example" />{props.title}</label>
     </div>
     )
 }

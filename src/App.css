@@ -103,6 +103,28 @@ input[type="radio"] {
     transform: scale(1);
   }
 
+  select{
+    appearance: none;
+    width: fit-content;
+    border-radius: 0.25em;
+    padding: 0.5em .5em;
+    line-height: 1.1;
+    background-color: #fff;
+    border: 3px solid #000;
+    margin: 0;
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  select:hover{
+    border-color: #006DFF
+  }
+
+  select:focus-visible{
+    outline: 3px solid black;
+  }
+
 /* COLOR INPUT STYLES */
 
 .color-input {
