@@ -196,19 +196,21 @@ function changeOneColor(baseColor, compliantLums){
         }
     }
     compliantLums = reducedLums;
+    //Add a color spectrum if the color is grey, for variety
     let greyScale = baseColors.filter(color => {
-        return color.lch()[1] < 1
+        return color.lch()[1] < 15
     })
     if(greyScale.length > 0){
-        baseColors = baseColors.concat(liftChroma(greyScale, 2, 30));
-        baseColors = baseColors.concat(addHues(baseColors, 4, 40));
+        baseColors = baseColors.concat(liftChroma(greyScale, 3, 40));
+        baseColors = baseColors.concat(addHues(baseColors, 4, 60));
     } else {
+        //Add variety in terms of hue
         if(compliantLums.length*baseColors.length < 2){
-            baseColors = baseColors.concat(addHues(baseColors, 6, 20));
+            baseColors = baseColors.concat(addHues(baseColors, 20, 10));
         } else if(compliantLums.length*baseColors.length < 4){
-            baseColors = baseColors.concat(addHues(baseColors, 4, 20));
+            baseColors = baseColors.concat(addHues(baseColors, 8, 15));
         } else if(compliantLums.length*baseColors.length < 10){
-            baseColors = baseColors.concat(addHues(baseColors, 2, 20));
+            baseColors = baseColors.concat(addHues(baseColors, 4, 20));
         }
     }
     baseColors.forEach(baseColor => {
