@@ -76,7 +76,7 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
       if(recs.length === 0){
         isMessage = true;
         return <>
-        <div>
+        <div role="alert" className= "failedMessage">
         <p>No compliant colours were found for this input.</p>
         <p>Consider the following options:</p>
         <ul>
@@ -96,7 +96,7 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
       }
     } else {
       isMessage = true;
-       return <div className = "failedMessage">{recs}</div>
+       return <div role= "alert" className = "failedMessage">{recs}</div>
     }
   }
 

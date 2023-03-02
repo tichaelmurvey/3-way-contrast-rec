@@ -14,7 +14,6 @@ function App() {
     setTestCase(testCase);
   }
   function handleTestColorChange(testColors){
-    console.log(testColors);
     setTestColors(testColors);
   }
   function manualUpdateRatio(newRatio){
