@@ -4,7 +4,7 @@ import {ComponentPreview} from "./preview"
 
 export default function Fixes({test, colors}){
     const [results, setResults] = useState();
-    const [checked, setChecked] = useState([false, false, false]);
+    const [checked, setChecked] = useState([true, true, true]);
 
     function getResults(){
       let colorInput = colors.slice(0,(test.colors.length))
@@ -49,7 +49,7 @@ function ColorSelector({index, color, test, updateChecked}){
   }
   return(
     <label htmlFor={"color-"+index+"-checkbox"} className="changeSelect">
-    <input onChange={changeHandler} type="checkbox" id={"color-"+index+"-checkbox"} /> 
+    <input defaultChecked onChange={changeHandler} type="checkbox" id={"color-"+index+"-checkbox"} /> 
     {test.colors[index]}
     <div className="color-preview" style={{backgroundColor: color}} />
     </label>
@@ -69,7 +69,6 @@ function Results({changeColors, keepColors, ratio, test}){
 
 function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumColors}){
   let isMessage = false;
-  let moreButton;
   function renderResults(changeColors, keepColors, ratio, test, numColors){
     let recs = getRecs(changeColors, keepColors, ratio, numColors);
     if(typeof(recs) == "object"){

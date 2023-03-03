@@ -132,6 +132,7 @@ input[type="radio"] {
 .color-input {
     margin: 20px 0;
     align-items: center;
+    position: relative;
 }
 
 .color-input label {
@@ -156,6 +157,19 @@ input[type="radio"] {
 .color-container {
     display: flex;
     flex-wrap: nowrap;
+}
+
+.picker {
+    appearance: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+.pickerPopup {
+    position: absolute;
+    z-index: 2;
 }
 
 /* RESULTS STYLES */
