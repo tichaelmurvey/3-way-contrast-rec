@@ -57,7 +57,8 @@ function ColorSelector({index, color, test, updateChecked}){
 }
 
 function Results({changeColors, keepColors, ratio, test}){
-  let [NumColors, setNumColors] = useState(4);
+  let defaultNumColors = 6;
+  let [NumColors, setNumColors] = useState(defaultNumColors);
   let resultBlock = <ResultBlock changeColors={changeColors} keepColors={keepColors} ratio={ratio} test={test} numColors={NumColors} setNumColors={setNumColors} />
   return(
     <div className = "resultsContainer">
@@ -102,10 +103,10 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
   function getButton(){
       return numColors < 20 ?
       <button onClick={()=>{
-        setNumColors(20);
+        setNumColors(500);
       }} className="get-fixes see-more" >See more</button>
       :  <button onClick={()=>{
-        setNumColors(4);
+        setNumColors(6);
       }} className="get-fixes see-more" >See less</button>
     }
   return(
