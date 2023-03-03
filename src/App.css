@@ -169,9 +169,18 @@ input[type="radio"] {
 
 .pickerPopup {
     position: absolute;
+    right: -230px;
+    top: 25px;
     z-index: 2;
 }
 
+@media only screen and (max-width: 750px) {
+    .pickerPopup {
+        right: 0px;
+        top: 60px;
+    }
+  }
+  
 /* RESULTS STYLES */
 .results {
     flex-basis: 1;

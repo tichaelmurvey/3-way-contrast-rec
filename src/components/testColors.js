@@ -23,7 +23,8 @@ function ColorPicker({testItem, color, index, handleChangeColor}){
   const [showPicker, setShowPicker] = useState(false);
   const [localColor, setLocalColor] = useState(color);
   const wrapperRef = useRef(null);
-  useOutsideAlerter(wrapperRef, closeColorPicker);
+  const buttonRef = useRef(null);
+  useOutsideAlerter(wrapperRef, buttonRef, closeColorPicker);
 
   function closeColorPicker(){
     setShowPicker(false);
@@ -44,10 +45,10 @@ function ColorPicker({testItem, color, index, handleChangeColor}){
       <label htmlFor={"color-"+index}>{testItem}</label>
       <div className="color-container">
         <input onChange={changeHandler} type="text" id={"color-"+index} value={localColor} />
-        <button onClick = {openColorPicker} className="picker"><div className={"color-preview color-"+index} style={{backgroundColor: color}} /></button>
+        <button ref={buttonRef} onClick = {openColorPicker} className="picker"><div className={"color-preview color-"+index} style={{backgroundColor: color}} /></button>
       </div>
-    <div ref={wrapperRef} >
-    <PickerBox color={color} index={index} changeHandler={pickerChangeHandler} show={showPicker}/>
+    <div ref={wrapperRef}>
+    <PickerBox  color={color} index={index} changeHandler={pickerChangeHandler} show={showPicker}/>
     </div>
     </div>
   )
@@ -66,13 +67,13 @@ function PickerBox({color, index, changeHandler, show}){
   )
 }
 
-function useOutsideAlerter(ref, closePicker) {
+function useOutsideAlerter(ref, buttonRef, closePicker) {
   useEffect(() => {
     /**
      * Alert if clicked on outside of element
      */
     function handleClickOutside(event) {
-      if (ref.current && !ref.current.contains(event.target)) {
+      if (ref.current && !ref.current.contains(event.target) && !buttonRef.current.contains(event.target)) {
         closePicker();
       }
     }
