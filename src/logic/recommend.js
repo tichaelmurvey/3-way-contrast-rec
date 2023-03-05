@@ -10,10 +10,12 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
     console.log("Running function getRecs");
     let recOutput = recSorter(changeColors, keepColors, ratio);
     if(typeof(recOutput) === "object"){
-        console.log("colors made", recOutput.length);
-        recOutput = sortColors(recOutput);
-        console.log(recOutput.length);
-        recOutput = filterSimilarColorsets(recOutput, numRecs, changeColors, keepColors);
+        if(recOutput.length > 0){
+            console.log("colors made", recOutput.length);
+            recOutput = sortColors(recOutput);
+            console.log(recOutput.length);
+            recOutput = filterSimilarColorsets(recOutput, numRecs, changeColors, keepColors);    
+        }
     }
     return recOutput;
 }
@@ -53,7 +55,6 @@ function getSecondColor(keepColor, changeColor, ratio){
     
     //Find luminances that are compliant
     let compliantLums = Object.values(secondLuminance(initialLum, ratio)).filter(n => n);
-    
     //Modify the new color to meet the requirements
     let newColors = changeOneColor(changeColor.color, compliantLums)
     newColors = newColors.map(newColor =>{

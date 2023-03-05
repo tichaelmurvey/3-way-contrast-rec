@@ -78,7 +78,7 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
         <p>No compliant colours were found for this input.</p>
         <p>Consider the following options:</p>
         <ul>
-          <li>Try allowing more colours to change, it's possible the colours you chose do not have a third compliant colour.</li>
+          <li>Try allowing more colours to change, it's possible the colours you chose do not have a compliant option, especially at higher contrast ratios.</li>
           <li>Note that there are no compliant combinations of 3 colours at a ratio of 7.</li>
           <li>Try swapping one of the colours for black or white.</li>
         </ul>
