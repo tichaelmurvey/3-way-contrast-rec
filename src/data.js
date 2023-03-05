@@ -32,7 +32,7 @@ export const testCases =  [
             "Button"
         ],
         triangle: true,
-        req: "Strictly speaking, the focus indicator requires a focus of 3 against the button, while the text requires a contrast of 4.5 against the button. This pattern assumes the same colour is used for the background and the text, but it is possible to use four colours and have a more complex contrast relationship."
+        req: "Strictly speaking, the focus indicator requires a focus of 3 against the button, while the text requires a contrast of 4.5 against the button. This pattern assumes the same color is used for the background and the text, but it is possible to use four colors and have a more complex contrast relationship."
     },
     {
         testCase: "button",

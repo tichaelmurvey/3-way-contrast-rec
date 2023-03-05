@@ -11,7 +11,7 @@ export default function TestColors({changeColors, test, colors}){
     }
     return (
     <div className="section colors">
-    <h2>🎨 With the colours</h2>
+    <h2>🎨 With the colors</h2>
     {test.colors.map((test, index) =>{
       return <ColorPicker testItem={test} color={colors[index]} index={index} handleChangeColor={inputChangeHandler}/>
     })}

@@ -28,8 +28,8 @@ export default function Fixes({test, colors}){
     return(
       <div className="section fixes">
         <div className="fixesInput">
-          <h2>👩‍🏫 Recommend colours</h2>
-          <p>Choose which colours to change.</p>
+          <h2>👩‍🏫 Recommend colors</h2>
+          <p>Choose which colors to change.</p>
           {
             [...Array(test.colors.length).keys()].map((item, index) => {
               return <ColorSelector key={index} index={index} color={colors[index].color} test={test} updateChecked={updateChecked}/>
@@ -75,12 +75,12 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
         isMessage = true;
         return <>
         <div role="alert" className= "failedMessage">
-        <p>No compliant colours were found for this input.</p>
+        <p>No compliant colors were found for this input.</p>
         <p>Consider the following options:</p>
         <ul>
-          <li>Try allowing more colours to change, it's possible the colours you chose do not have a compliant option, especially at higher contrast ratios.</li>
-          <li>Note that there are no compliant combinations of 3 colours at a ratio of 7.</li>
-          <li>Try swapping one of the colours for black or white.</li>
+          <li>Try allowing more colors to change, it's possible the colors you chose do not have a compliant option, especially at higher contrast ratios.</li>
+          <li>Note that there are no compliant combinations of 3 colors at a ratio of 7.</li>
+          <li>Try swapping one of the colors for black or white.</li>
         </ul>
         </div>
          </>;
