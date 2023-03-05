@@ -6,7 +6,7 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
     changeColors = structuredClone(changeColors);
     keepColors = structuredClone(keepColors);
     initialRatio = ratio;
-    ratio = ratio+ratio*0.02;
+    ratio = ratio+ratio*0.01;
     console.log("Running function getRecs");
     let recOutput = recSorter(changeColors, keepColors, ratio);
     if(typeof(recOutput) === "object"){
