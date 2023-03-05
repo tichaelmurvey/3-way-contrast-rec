@@ -1,12 +1,15 @@
 import { within } from '@testing-library/react';
-import chroma from 'chroma-js';
+import chroma, { average } from 'chroma-js';
 let compliantMessage = "These colours are already compliant at this contrast ratio."
 
 export default function getRecs(changeColors, keepColors, ratio, numRecs){
+    changeColors = structuredClone(changeColors);
+    keepColors = structuredClone(keepColors);
     ratio = ratio+0.02;
     console.log("Running function getRecs");
-    console.log(changeColors, keepColors, ratio, numRecs);
+    console.log("getrecs summary", changeColors, keepColors, ratio, numRecs, typeof(changeColors[0].color) === "string");
     let recOutput = recSorter(changeColors, keepColors, ratio);
+    console.log("after recoutput", typeof(changeColors[0].color) === "string");
     if(typeof(recOutput) === "object"){
         console.log("colors made", recOutput.length);
         recOutput = sortColors(recOutput);
@@ -38,6 +41,8 @@ function recSorter(changeColors, keepColors, ratio){
 //======================Colour modifiers==============================
 //Modify an existing color to meet contrast with another color
 function getSecondColor(keepColor, changeColor, ratio){
+    keepColor = structuredClone(keepColor);
+    changeColor = structuredClone(changeColor);
     keepColor.color = chroma(keepColor.color);
     changeColor.color = chroma(changeColor.color);
     if(chroma.contrast(keepColor.color, changeColor.color) >= ratio){
@@ -56,7 +61,6 @@ function getSecondColor(keepColor, changeColor, ratio){
         return {color: newColor.hex(), index: changeColor.index}
     });;
     keepColor.color = keepColor.color.hex();
-    //TODO: Check if any colours are the same
     return newColors.map(color => {return [color,keepColor]});
 }
 
@@ -84,7 +88,6 @@ function getThirdColor(keepColors, changeColors, ratio){
     });;
     keepOne.color = keepOne.color.hex();
     keepTwo.color = keepTwo.color.hex();
-    //TODO: Check if any colours are the same
     return newColors.map(color => {return [color,keepOne,keepTwo]})
 }
 
@@ -485,36 +488,48 @@ function ThreeWayChecker(color1, color2, color3, ratio){
 
 export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepColors){
     //Get most similar to original colours
-    console.log("color sets", colorSets.length);
+    console.log("color sets", colorSets);
+    console.log("changecolors", changeColors, "keepcolors", keepColors);
     let returnColors = [];
     let originalColors = sortColors([changeColors.concat(keepColors)])[0];
     console.log("original colors", originalColors);
     function distanceBetweenSets(set1, set2){
         let distances = set1.map((color, index) => {
-            chroma.deltaE(color.color, set2[index].color);
+            return chroma.deltaE(color.color, set2[index].color);
         });
-        return distances.reduce( ( p, c ) => p + c, 0 ) / distances.length;
+        let gap = distances.reduce( ( p, c ) => p + c, 0 ) / distances.length;
+        return gap;
     }
     colorSets.sort((a, b) => {
         return distanceBetweenSets(originalColors, b) - distanceBetweenSets(originalColors, a);
     })
-    let mostSimilar = colorSets[0];
-    returnColors.push(colorSets[0], colorSets[1]);
-    console.log("return colors", returnColors)
+    let remainingColors = colorSets.slice(1, colorSets.length-1);
+    returnColors.push(colorSets[0]);
+    console.log("most similar color", [...returnColors])
+    
+    //Order recs by uniqueness
     for(let i=0; i<numRecs; i++){
         //Scan the current return colors to get the average color
         let averageRec = [];
         returnColors[0].forEach((color, index) => {
-            let colorList = returnColors.map((color) => {
-                console.log("mapping this color", color);
+            let colorList = returnColors.map(color => {
                 return color[index].color;
             })
             averageRec.push({color: chroma.average(colorList).hex(), index: index});
         })
+        //Sort recs by uniqueness compared to average
         console.log("average rec", averageRec);
+        remainingColors.sort((a, b) => {
+             return distanceBetweenSets(averageRec, b) - distanceBetweenSets(averageRec, a);
+        })
+        returnColors.push(remainingColors[0]);
+        remainingColors = remainingColors.slice(1, remainingColors.length-1);
     }
     //TODO: for the number of recs, get the next rec which balances being farthest from the other recs while being closest to the origianal colours
     
+    //Sort recs by distance from current average
+    
+
     // let filteredColorSets = colorSets.filter((colorSet, index, colorSets) => {
     //     let sameColor = colorSets.find((checkColorSet) => {
     //         return checkColorSet.every((color, colorIndex) => {
@@ -525,7 +540,7 @@ export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepCol
     //         return colorSet;
     //     } 
     // })
-    return colorSets.slice(0, numRecs);
+    return returnColors;
 }
 
 function sortColors(colorSets){

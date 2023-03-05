@@ -5,9 +5,9 @@ import {ComponentPreview} from "./preview"
 export default function Fixes({test, colors}){
     const [results, setResults] = useState();
     const [checked, setChecked] = useState([true, true, true]);
-
     function getResults(){
-      let colorInput = colors.slice(0,(test.colors.length))
+      let localColors = structuredClone(colors)
+      let colorInput = localColors.slice(0,(test.colors.length))
       setResults(<Results 
       changeColors={colorInput.filter(function(color){
         return checked[color.index];
@@ -23,7 +23,6 @@ export default function Fixes({test, colors}){
     function updateChecked(index){
       let copyChecked = [...checked];
       copyChecked[index] = !copyChecked[index];
-      console.log(copyChecked);
       setChecked(copyChecked);
     }
     return(
@@ -63,7 +62,6 @@ function Results({changeColors, keepColors, ratio, test}){
   return(
     <div className = "resultsContainer">
         {resultBlock}
-      {console.log("resultblock", resultBlock)}
     </div>
   )
 }

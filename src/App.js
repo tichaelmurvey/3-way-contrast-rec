@@ -10,6 +10,7 @@ import { useState } from 'react';
 function App() {
   const [testCase, setTestCase] = useState(testCases[0]);
   const [testColors, setTestColors] = useState(["#FFFFFF", "#006DFF", "#000000"]);
+  console.log('initial test colors', testColors);
   function handleTestChange(testCase){
     setTestCase(testCase);
   }
