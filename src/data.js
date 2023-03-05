@@ -43,7 +43,7 @@ export const testCases =  [
             "Button"
         ],
         triangle: true,
-        req: "The button's text must have a contrast of 4.5 against the button's background. The page's background color is stritly speaking irrelevant, but keeping contrast between the button and page is good practice."
+        req: "The button's text must have a contrast of 4.5 against the button's background. The page's background color is not required to contrast, but keeping contrast between the button and page is good practice."
     },
     {
         testCase: "link",
