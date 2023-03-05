@@ -101,7 +101,7 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
   function getButton(){
       return numColors < 20 ?
       <button onClick={()=>{
-        setNumColors(500);
+        setNumColors(20);
       }} className="get-fixes see-more" >See more</button>
       :  <button onClick={()=>{
         setNumColors(6);

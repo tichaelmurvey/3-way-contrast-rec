@@ -491,6 +491,9 @@ export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepCol
     console.log("color sets", colorSets);
     console.log("changecolors", changeColors, "keepcolors", keepColors);
     let returnColors = [];
+    if(numRecs > colorSets.length){
+        numRecs = colorSets.length;
+    }
     let originalColors = sortColors([changeColors.concat(keepColors)])[0];
     console.log("original colors", originalColors);
     function distanceBetweenSets(set1, set2){
@@ -501,46 +504,38 @@ export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepCol
         return gap;
     }
     colorSets.sort((a, b) => {
-        return distanceBetweenSets(originalColors, b) - distanceBetweenSets(originalColors, a);
+        return distanceBetweenSets(originalColors, a) - distanceBetweenSets(originalColors, b);
     })
-    let remainingColors = colorSets.slice(1, colorSets.length-1);
+    let remainingColors = [...colorSets.slice(1, colorSets.length)];
     returnColors.push(colorSets[0]);
     console.log("most similar color", [...returnColors])
+    console.log('remaining colors', [...remainingColors])
     
     //Order recs by uniqueness
-    for(let i=0; i<numRecs; i++){
+    for(let i=0; i<numRecs-1; i++){
         //Scan the current return colors to get the average color
         let averageRec = [];
         returnColors[0].forEach((color, index) => {
-            let colorList = returnColors.map(color => {
-                return color[index].color;
+            //Make list of colors in this test case position
+            let colorList = returnColors.map(colorSet => {
+                console.log(colorSet);
+                return colorSet[index].color;
             })
             averageRec.push({color: chroma.average(colorList).hex(), index: index});
         })
         //Sort recs by uniqueness compared to average
-        console.log("average rec", averageRec);
         remainingColors.sort((a, b) => {
              return distanceBetweenSets(averageRec, b) - distanceBetweenSets(averageRec, a);
         })
         returnColors.push(remainingColors[0]);
-        remainingColors = remainingColors.slice(1, remainingColors.length-1);
+        remainingColors = remainingColors.slice(1, remainingColors.length);
+        console.log("remaining colors", remainingColors, "return colors", returnColors);
     }
     //TODO: for the number of recs, get the next rec which balances being farthest from the other recs while being closest to the origianal colours
     
-    //Sort recs by distance from current average
-    
-
-    // let filteredColorSets = colorSets.filter((colorSet, index, colorSets) => {
-    //     let sameColor = colorSets.find((checkColorSet) => {
-    //         return checkColorSet.every((color, colorIndex) => {
-    //             return chroma.deltaE(color.color, colorSet[colorIndex].color) < matchBuffer;
-    //         })
-    //     });
-    //     if(colorSets.indexOf(sameColor) === index){
-    //         return colorSet;
-    //     } 
-    // })
-    return returnColors;
+    return returnColors.sort((a, b) => {
+        return distanceBetweenSets(originalColors, a) - distanceBetweenSets(originalColors, b);
+   });
 }
 
 function sortColors(colorSets){
