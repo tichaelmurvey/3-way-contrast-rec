@@ -7,9 +7,7 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
     keepColors = structuredClone(keepColors);
     ratio = ratio+0.02;
     console.log("Running function getRecs");
-    console.log("getrecs summary", changeColors, keepColors, ratio, numRecs, typeof(changeColors[0].color) === "string");
     let recOutput = recSorter(changeColors, keepColors, ratio);
-    console.log("after recoutput", typeof(changeColors[0].color) === "string");
     if(typeof(recOutput) === "object"){
         console.log("colors made", recOutput.length);
         recOutput = sortColors(recOutput);

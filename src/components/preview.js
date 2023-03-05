@@ -13,6 +13,7 @@ export function ComponentPreview({test, colors}){
     return(
         <>
         {test.testCase === "focused_button" && <FocusedButtonExample colors={colors}/>}
+        {test.testCase === "focused_button_notext" && <FocusedButtonNoTextExample colors={colors}/>}
         {test.testCase === "button" && <ButtonExample colors={colors}/>}
         {test.testCase === "link" && <LinkExample colors={colors}/>}
         {test.testCase === "text_regular" && <TextExample colors={colors}/>}
@@ -41,16 +42,39 @@ function FocusedButtonExample ({colors}){
         </div>
     )
 }
+function FocusedButtonNoTextExample ({colors}){
+    return (
+        <div className="example focused-button-example"
+        style={{
+            backgroundColor: colors[0]
+        }}
+        >
+        <button
+            style={{
+                backgroundColor: colors[2],
+                color: colors[0],
+                border: "2px solid",
+                borderColor: colors[1],
+                width: "100px",
+                minHeight: "50px"
+            }}
+        ></button>
+        </div>
+    )
+}
 
 
 function ButtonExample ({colors}){
     return (
         <div className="example button-example"
-        >
+        style={{
+            backgroundColor: colors[0]
+        }}        >
         <button
             style = {{
-                backgroundColor: colors[0],
-                color: colors[1]
+                backgroundColor: colors[1],
+                color: colors[0],
+                border: "none"
             }}
         >Button</button>
         </div>

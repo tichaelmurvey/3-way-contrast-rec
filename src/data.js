@@ -11,8 +11,8 @@ export const testCases =  [
         req: "Regular size text needs to have a contrast ratio of 4.5 against its background."
     },
     {
-        testCase: "focused_button",
-        title: "Focused button",
+        testCase: "focused_button_notext",
+        title: "Focused button without text",
         ratio: 3,
         colors: [
             "Background",
@@ -20,7 +20,30 @@ export const testCases =  [
             "Button"
         ],
         triangle: true,
-        req: "Focused buttons description."
+        req: "A focus indicator should have a contrast of 3 against the button and the background."
+    },
+    {
+        testCase: "focused_button",
+        title: "Focused button with text",
+        ratio: 4.5,
+        colors: [
+            "Background/text",
+            "Focus outline",
+            "Button"
+        ],
+        triangle: true,
+        req: "Strictly speaking, the focus indicator requires a focus of 3 against the button, while the text requires a contrast of 4.5 against the button. This pattern assumes the same colour is used for the background and the text, but it is possible to use four colours and have a more complex contrast relationship."
+    },
+    {
+        testCase: "button",
+        title: "Button",
+        ratio: 4.5,
+        colors: [
+            "Background/text",
+            "Button"
+        ],
+        triangle: true,
+        req: "The button's text must have a contrast of 4.5 against the button's background. The page's background color is stritly speaking irrelevant, but keeping contrast between the button and page is good practice."
     },
     {
         testCase: "link",
