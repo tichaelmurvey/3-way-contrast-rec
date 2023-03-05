@@ -1,11 +1,12 @@
 import { within } from '@testing-library/react';
 import chroma, { average } from 'chroma-js';
 let compliantMessage = "These colours are already compliant at this contrast ratio."
-
+let initialRatio;
 export default function getRecs(changeColors, keepColors, ratio, numRecs){
     changeColors = structuredClone(changeColors);
     keepColors = structuredClone(keepColors);
-    ratio = ratio+0.02;
+    initialRatio = ratio;
+    ratio = ratio+ratio*0.02;
     console.log("Running function getRecs");
     let recOutput = recSorter(changeColors, keepColors, ratio);
     if(typeof(recOutput) === "object"){
@@ -43,7 +44,7 @@ function getSecondColor(keepColor, changeColor, ratio){
     changeColor = structuredClone(changeColor);
     keepColor.color = chroma(keepColor.color);
     changeColor.color = chroma(changeColor.color);
-    if(chroma.contrast(keepColor.color, changeColor.color) >= ratio){
+    if(chroma.contrast(keepColor.color, changeColor.color) >= initialRatio){
         return compliantMessage;
     }
     
@@ -69,7 +70,7 @@ function getThirdColor(keepColors, changeColors, ratio){
     keepOne.color = chroma(keepOne.color);
     keepTwo.color = chroma(keepTwo.color);
     changeColor.color = chroma(changeColor.color);
-    if(ThreeWayChecker(keepOne.color, keepTwo.color, changeColor.color, ratio)){
+    if(ThreeWayChecker(keepOne.color, keepTwo.color, changeColor.color, initialRatio)){
         return compliantMessage;
     }
     if(chroma.contrast(keepOne.color, keepTwo.color) < ratio){
@@ -96,7 +97,7 @@ function getTwoColors(keepColors, changeColors, ratio){
     changeOne.color = chroma(changeOne.color);
     changeTwo.color = chroma(changeTwo.color);
     keepColor.color = chroma(keepColor.color);    
-    if(ThreeWayChecker(keepColor.color, changeOne.color, changeTwo.color, ratio)){
+    if(ThreeWayChecker(keepColor.color, changeOne.color, changeTwo.color, initialRatio)){
         return compliantMessage;
     }
     let colors = [];
@@ -135,21 +136,21 @@ function changeEverythingTwo(changeColors, ratio){
     let colors = [];
     let colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
     let colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
-    if(chroma.contrast(chroma(changeColors[0].color), chroma(changeColors[1].color)) >= ratio){
+    if(chroma.contrast(chroma(changeColors[0].color), chroma(changeColors[1].color)) >= initialRatio){
         return compliantMessage;
     }
 
     //Try change 1
-    // if(chroma.contrast(colour1passthrough.color, colour2passthrough.color) >= ratio){
-    //     return compliantMessage;
-    // }
-    // colors = colors.concat(getSecondColor(colour1passthrough, colour2passthrough, ratio))
-    // console.log('changing color one', colors.length);
-    // //Try change the other
-    // colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
-    // colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
-    // colors = colors.concat(getSecondColor(colour2passthrough, colour1passthrough, ratio))
-    // console.log('changing color 2', colors.length);
+    if(chroma.contrast(colour1passthrough.color, colour2passthrough.color) >= initialRatio){
+        return compliantMessage;
+    }
+    colors = colors.concat(getSecondColor(colour1passthrough, colour2passthrough, ratio))
+    console.log('changing color one', colors.length);
+    //Try change the other
+    colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
+    colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
+    colors = colors.concat(getSecondColor(colour2passthrough, colour1passthrough, ratio))
+    console.log('changing color 2', colors.length);
     // Try change both
     colour1passthrough = {color: changeColors[0].color, index: changeColors[0].index}
     colour2passthrough = {color: changeColors[1].color, index: changeColors[1].index}
@@ -184,7 +185,7 @@ function changeEverythingThree(changeColors, ratio){
     let changeColorPassthrough = changeColors.map(useColor => {
         return {color: chroma(useColor.color), index: useColor.index}
     })
-    if(ThreeWayChecker(changeColorPassthrough[0].color, changeColorPassthrough[1].color, changeColorPassthrough[2].color, ratio)){
+    if(ThreeWayChecker(changeColorPassthrough[0].color, changeColorPassthrough[1].color, changeColorPassthrough[2].color, initialRatio)){
         return compliantMessage;
     }
     let colors = [];
@@ -283,7 +284,7 @@ function generateFromLuminosity(baseColor, compliantLums){
         // let interpolateAdjust = baseColor.luminance(lum);
         //newColor = tweak(newColor, baseColor, ratio, "rgb");
         // colors.push(interpolateAdjust);
-        let lightnessAdjust = adjustLightnessBetween(baseColor, lum, lum-0.01, lum+0.01)
+        let lightnessAdjust = adjustLightnessBetween(baseColor, lum, lum-0.001, lum+0.001)
         colors.push(lightnessAdjust);
 
     })
