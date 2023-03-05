@@ -525,7 +525,7 @@ export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepCol
         })
         //Sort recs by uniqueness compared to average
         remainingColors.sort((a, b) => {
-             return distanceBetweenSets(averageRec, b) - distanceBetweenSets(averageRec, a);
+             return Math.pow(distanceBetweenSets(averageRec, b), 1.5)/distanceBetweenSets(originalColors, b) - Math.pow(distanceBetweenSets(averageRec, a),1.5)/distanceBetweenSets(originalColors, a);
         })
         returnColors.push(remainingColors[0]);
         remainingColors = remainingColors.slice(1, remainingColors.length);
