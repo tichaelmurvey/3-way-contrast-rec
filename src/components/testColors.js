@@ -24,7 +24,7 @@ function ColorPicker({testItem, color, index, handleChangeColor}){
   const [localColor, setLocalColor] = useState(color);
   const wrapperRef = useRef(null);
   const buttonRef = useRef(null);
-  useOutsideAlerter(wrapperRef, buttonRef, closeColorPicker);
+  //useOutsideAlerter(wrapperRef, buttonRef, closeColorPicker);
 
   function closeColorPicker(){
     setShowPicker(false);
@@ -60,7 +60,7 @@ function PickerBox({color, index, changeHandler, show}){
     changeHandler(color);
   }
   return(
-  <div className = {"pickerPopup pickerPopup"+index} style={show ? {visibility: "visible"} : {visibility: "hidden"}}><ChromePicker 
+  <div className = {"pickerPopup pickerPopup"+index} style={show ? {display: "block"} : {display: "none"}}><ChromePicker 
           color = {color}
           onChange = {pickerChangeHandler}
         /></div>

@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import getRecs from "../logic/recommend";
 import {ComponentPreview} from "./preview"
 
-export default function Fixes({test, colors}){
+export default function Fixes({updateColors, test, colors}){
     const [results, setResults] = useState();
     const [checked, setChecked] = useState([true, true, true]);
     function getResults(){
       let localColors = structuredClone(colors)
       let colorInput = localColors.slice(0,(test.colors.length))
       setResults(<Results 
+      updateColors={updateColors}
       changeColors={colorInput.filter(function(color){
         return checked[color.index];
       })}
@@ -55,10 +56,10 @@ function ColorSelector({index, color, test, updateChecked}){
   )
 }
 
-function Results({changeColors, keepColors, ratio, test}){
+function Results({updateColors, changeColors, keepColors, ratio, test}){
   let defaultNumColors = 6;
   let [NumColors, setNumColors] = useState(defaultNumColors);
-  let resultBlock = <ResultBlock changeColors={changeColors} keepColors={keepColors} ratio={ratio} test={test} numColors={NumColors} setNumColors={setNumColors} />
+  let resultBlock = <ResultBlock changeColors={changeColors} keepColors={keepColors} ratio={ratio} test={test} numColors={NumColors} setNumColors={setNumColors} updateColors={updateColors}/>
   return(
     <div className = "resultsContainer">
         {resultBlock}
@@ -66,10 +67,10 @@ function Results({changeColors, keepColors, ratio, test}){
   )
 }
 
-function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumColors}){
+function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumColors, updateColors}){
   let isMessage = false;
   function renderResults(changeColors, keepColors, ratio, test, numColors){
-    let recs = getRecs(changeColors, keepColors, ratio, numColors);
+    let recs = getRecs(changeColors, keepColors, ratio, numColors, updateColors);
     if(typeof(recs) == "object"){
       if(recs.length === 0){
         isMessage = true;
@@ -88,7 +89,7 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
         isMessage = false;
         return <div className = "results">
         {recs.map((colorSet, index) => {
-          return <ResultContainer key={index} colorSet={colorSet} test={test}/>
+          return <ResultContainer key={index} colorSet={colorSet} test={test} updateColors={updateColors}/>
         })}
       </div>
       }
@@ -115,7 +116,12 @@ function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumCo
   )
 }
 
-function ResultContainer({colorSet, test}){
+function ResultContainer({colorSet, test, updateColors}){
+  function updateButtonHandler(){
+    updateColors(colorSet.map(color => {
+      return color.color
+    }));
+  }
   return(
     <div className="result">
       <ComponentPreview test={test} colors={colorSet.map(color => {return color.color})} />
@@ -124,6 +130,7 @@ function ResultContainer({colorSet, test}){
               <p><div className="color-preview" style={{backgroundColor: color.color}} />{test.colors[color.index]}: {color.color} </p>
             </div>
       ))}
+    <button onClick={updateButtonHandler}>Use these colors</button>
     </div>
   )
 }

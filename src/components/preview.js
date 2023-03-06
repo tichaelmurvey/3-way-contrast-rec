@@ -33,10 +33,10 @@ function FocusedButtonExample ({colors}){
         >
         <button
             style={{
-                backgroundColor: colors[2],
+                backgroundColor: colors[1],
                 color: colors[0],
                 border: "2px solid",
-                borderColor: colors[1]
+                borderColor: colors[2]
             }}
         >Focused button</button>
         </div>
@@ -51,10 +51,10 @@ function FocusedButtonNoTextExample ({colors}){
         >
         <button
             style={{
-                backgroundColor: colors[2],
+                backgroundColor: colors[1],
                 color: colors[0],
                 border: "2px solid",
-                borderColor: colors[1],
+                borderColor: colors[2],
                 width: "100px",
                 minHeight: "50px"
             }}
@@ -90,11 +90,11 @@ function LinkExample ({colors}){
     >
     <span 
     style={{
-        color: colors[1]
+        color: colors[2]
     }}
     >Some text, with a <a href="#"         
         style={{
-        color: colors[2],
+        color: colors[1],
         textDecoration: "none"
     }}>link</a></span>
     </div>

@@ -168,18 +168,16 @@ input[type="radio"] {
 }
 
 .pickerPopup {
-    position: absolute;
-    right: -230px;
-    top: 25px;
+    margin: 20px 0;
     z-index: 2;
 }
 
-@media only screen and (max-width: 750px) {
+/* @media only screen and (max-width: 750px) {
     .pickerPopup {
         right: 0px;
         top: 60px;
     }
-  }
+  } */
   
 /* RESULTS STYLES */
 .results {

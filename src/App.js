@@ -55,9 +55,10 @@ function App() {
           <Results test={testCase} colors={testColors}/>
           <Preview test={testCase} colors={testColors}/>
         </div>
-        <Fixes test={testCase} colors={testColors.map((color, index) => {
+        <Fixes updateColors={handleTestColorChange} test={testCase} colors={testColors.map((color, index) => {
       return {color: color, index: index}
-    })}/>
+    })}
+    />
     </>
   );
 }
