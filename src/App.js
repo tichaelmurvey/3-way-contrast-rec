@@ -14,8 +14,12 @@ function App() {
   function handleTestChange(testCase){
     setTestCase(testCase);
   }
-  function handleTestColorChange(testColors){
-    setTestColors(testColors);
+  function handleTestColorChange(inputColors){
+    let newTestColors = [...testColors];
+    inputColors.forEach((color, index) => {
+      newTestColors[index] = color;
+    })
+    setTestColors(newTestColors);
   }
   function manualUpdateRatio(newRatio){
     setTestCase({

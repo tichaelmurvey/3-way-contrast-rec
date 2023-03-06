@@ -22,10 +22,13 @@ export default function TestColors({changeColors, test, colors}){
 function ColorPicker({testItem, color, index, handleChangeColor}){
   const [showPicker, setShowPicker] = useState(false);
   const [localColor, setLocalColor] = useState(color);
+  //const [prevColor, setPrevColor] = useState(color);
   const wrapperRef = useRef(null);
   const buttonRef = useRef(null);
   //useOutsideAlerter(wrapperRef, buttonRef, closeColorPicker);
-
+  useEffect(() => {
+    setLocalColor(color);
+  }, [color])
   function closeColorPicker(){
     setShowPicker(false);
   }

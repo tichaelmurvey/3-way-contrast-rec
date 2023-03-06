@@ -3,6 +3,7 @@ import chroma from "chroma-js";
 
 
 export default function Results({test, colors}){
+  console.log("test colors", test.colors, "colors", colors)
     const ratio = test.ratio;
     let compliant = false;
     if(test.colors.length > 2){
