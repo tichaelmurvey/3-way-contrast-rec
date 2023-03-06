@@ -25,7 +25,7 @@ function ColorPicker({testItem, color, index, handleChangeColor}){
   //const [prevColor, setPrevColor] = useState(color);
   const wrapperRef = useRef(null);
   const buttonRef = useRef(null);
-  //useOutsideAlerter(wrapperRef, buttonRef, closeColorPicker);
+  useOutsideAlerter(wrapperRef, buttonRef, closeColorPicker);
   useEffect(() => {
     setLocalColor(color);
   }, [color])
@@ -76,15 +76,15 @@ function useOutsideAlerter(ref, buttonRef, closePicker) {
      * Alert if clicked on outside of element
      */
     function handleClickOutside(event) {
-      if (ref.current && !ref.current.contains(event.target) && !buttonRef.current.contains(event.target)) {
+      if (ref.current && !ref.current.contains(event.target) && buttonRef.current && !buttonRef.current.contains(event.target)) {
         closePicker();
       }
     }
     // Bind the event listener
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mouseup", handleClickOutside);
     return () => {
       // Unbind the event listener on clean up
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mouseup", handleClickOutside);
     };
   }, [ref]);
 }

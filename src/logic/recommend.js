@@ -623,11 +623,10 @@ export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepCol
         remainingColors = remainingColors.slice(1, remainingColors.length);
         console.log("remaining colors", remainingColors, "return colors", returnColors);
     }
-    //TODO: for the number of recs, get the next rec which balances being farthest from the other recs while being closest to the origianal colors
-    
-    return returnColors.sort((a, b) => {
-        return distanceBetweenSets(originalColors, a) - distanceBetweenSets(originalColors, b);
-   });
+        return returnColors;
+//     return returnColors.sort((a, b) => {
+//         return distanceBetweenSets(originalColors, a) - distanceBetweenSets(originalColors, b);
+//    });
 }
 
 function sortColors(colorSets){
