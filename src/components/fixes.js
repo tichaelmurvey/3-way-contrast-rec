@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import getRecs from "../logic/recommend";
 import {ComponentPreview} from "./preview"
 
@@ -69,6 +69,15 @@ function Results({updateColors, changeColors, keepColors, ratio, test}){
 
 function ResultBlock({changeColors, keepColors, ratio, test, numColors, setNumColors, updateColors}){
   let isMessage = false;
+  // function someRequest() { //Simulates a request; makes a "promise" that'll run for 2.5 seconds
+  //   return new Promise(function(myResolve, myReject) {
+  //     let result = renderResults(changeColors, keepColors, ratio, test, numColors);
+  //     setTimeout(myResolve(result), 2500)
+  //     myReject();  // when error
+  //   });
+  // } 
+
+
   function renderResults(changeColors, keepColors, ratio, test, numColors){
     let recs = getRecs(changeColors, keepColors, ratio, numColors, updateColors);
     if(typeof(recs) == "object"){
