@@ -9,10 +9,14 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
     ratio = ratio+ratio*0.01;
     console.log("Running function getRecs");
     let recOutput = recSorter(changeColors, keepColors, ratio);
-    if(typeof(recOutput) === "object"){
+    if(!recOutput.length){
+        recOutput = recSorter(changeColors, keepColors, initialRatio);
+    }
+    console.log(" recoutput", recOutput);
+    if(recOutput.length && typeof(recOutput) === "object"){
+        recOutput = sortColors(recOutput);
+        recOutput = filterFails(recOutput, initialRatio);
         if(recOutput.length > 0){
-            console.log("colors made", recOutput.length);
-            recOutput = sortColors(recOutput);
             console.log(recOutput.length);
             recOutput = filterSimilarColorsets(recOutput, numRecs, changeColors, keepColors);    
         }
@@ -316,7 +320,7 @@ function generateFromLuminosity(baseColor, compliantLums){
         // let interpolateAdjust = baseColor.luminance(lum);
         //newColor = tweak(newColor, baseColor, ratio, "rgb");
         // colors.push(interpolateAdjust);
-        let lightnessAdjust = adjustLightnessBetween(baseColor, lum, lum-0.001, lum+0.001)
+        let lightnessAdjust = adjustLightnessBetween(baseColor, lum, lum-0.0001, lum+0.0001)
         colors.push(lightnessAdjust);
 
     })
@@ -637,4 +641,16 @@ function sortColors(colorSets){
 
 function checkMatch(color1, color2, matchBuffer){
     return chroma.deltaE(color1, color2) < matchBuffer;
+}
+
+function filterFails(colorSets, ratio){
+    if(colorSets[0].length > 2){
+        return colorSets.filter(colorSet => {
+            return ThreeWayChecker(colorSet[0].color, colorSet[1].color, colorSet[2].color, ratio);
+        })  
+    } else {
+        return colorSets.filter(colorSet => {
+            return (chroma.contrast(colorSet[0].color, colorSet[1].color, ratio));
+        })
+    }
 }
