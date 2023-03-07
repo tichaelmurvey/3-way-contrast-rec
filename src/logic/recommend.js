@@ -28,7 +28,7 @@ function recSorter(changeColors, keepColors, ratio){
     } else if(keepColors.length == 2){
         return getThirdColor(keepColors, changeColors, ratio);
     } else if(changeColors.length === 1 && keepColors.length === 1){
-        return getSecondColor(keepColors[0], changeColors[0], ratio);
+        return getSecondColor(keepColors[0], changeColors[0], ratio, true);
     } else if(keepColors.length == 1 && changeColors.length == 2){
         return getTwoColors(keepColors, changeColors, ratio);
     } else if(keepColors.length == 0 && changeColors.length == 2){
@@ -43,7 +43,7 @@ function recSorter(changeColors, keepColors, ratio){
 
 //======================color modifiers==============================
 //Modify an existing color to meet contrast with another color
-function getSecondColor(keepColor, changeColor, ratio){
+function getSecondColor(keepColor, changeColor, ratio, makeLots=false){
     keepColor = structuredClone(keepColor);
     changeColor = structuredClone(changeColor);
     keepColor.color = chroma(keepColor.color);
@@ -58,7 +58,7 @@ function getSecondColor(keepColor, changeColor, ratio){
     //Find luminances that are compliant
     let compliantLums = Object.values(secondLuminance(initialLum, ratio)).filter(n => n);
     //Modify the new color to meet the requirements
-    let newColors = changeOneColor(changeColor.color, compliantLums)
+    let newColors = changeOneColor(changeColor.color, compliantLums, true)
     newColors = newColors.map(newColor =>{
         return {color: newColor.hex(), index: changeColor.index}
     });;
@@ -243,7 +243,7 @@ function changeEverythingThree(changeColors, ratio){
 
 // COLOR ADJUSTMENT
 
-function changeOneColor(baseColor, compliantLums){
+function changeOneColor(baseColor, compliantLums, makeLots=false){
     let baseColors = [baseColor];
     let returnColors = [];
     //Filter compliant lums to remove very similar options
@@ -273,6 +273,10 @@ function changeOneColor(baseColor, compliantLums){
         } else if(compliantLums.length*baseColors.length < 10){
             baseColors = baseColors.concat(addHues(baseColors, 4, 20));
         }
+    }
+    if(makeLots){
+        baseColors = baseColors.concat(liftChroma(baseColors, 1, 20));
+        baseColors = baseColors.concat(addHues(baseColors, 3, 40));
     }
     baseColors.forEach(baseColor => {
         returnColors = returnColors.concat(generateFromLuminosity(baseColor, compliantLums));
@@ -655,7 +659,7 @@ export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepCol
             averageRec.push({color: chroma.average(colorList).hex(), index: index});
         })
         //Sort recs by uniqueness compared to average
-        let uniqueness = 0.9;
+        let uniqueness = 1.2;
         remainingColors.sort((a, b) => {
             //return (distanceBetweenSets(averageRec, a) - distanceBetweenSets(averageRec, b)) ;
             return Math.pow(distanceBetweenSets(averageRec, b), uniqueness)/distanceBetweenSets(originalColors, b) - Math.pow(distanceBetweenSets(averageRec, a), uniqueness)/distanceBetweenSets(originalColors, a);
