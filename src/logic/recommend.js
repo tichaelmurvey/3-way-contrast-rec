@@ -1,4 +1,3 @@
-import { within } from '@testing-library/react';
 import chroma, { average } from 'chroma-js';
 let compliantMessage = "These colors are already compliant at this contrast ratio."
 let initialRatio;
