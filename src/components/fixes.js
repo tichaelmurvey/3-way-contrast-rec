@@ -5,9 +5,11 @@ import {ComponentPreview} from "./preview"
 export default function Fixes({updateColors, test, colors}){
     const [results, setResults] = useState();
     const [checked, setChecked] = useState([true, true, true]);
+    const [loading, setLoading] = useState(false);
+    
     function getResults(){
-      let localColors = structuredClone(colors)
-      let colorInput = localColors.slice(0,(test.colors.length))
+      let localColors = structuredClone(colors);
+      let colorInput = localColors.slice(0,(test.colors.length));
       setResults(<Results 
       updateColors={updateColors}
       changeColors={colorInput.filter(function(color){

@@ -12,12 +12,10 @@ export default function getRecs(changeColors, keepColors, ratio, numRecs){
     if(!recOutput.length){
         recOutput = recSorter(changeColors, keepColors, initialRatio);
     }
-    console.log(" recoutput", recOutput);
     if(recOutput.length && typeof(recOutput) === "object"){
         recOutput = sortColors(recOutput);
         recOutput = filterFails(recOutput, initialRatio);
         if(recOutput.length > 0){
-            console.log(recOutput.length);
             recOutput = filterSimilarColorsets(recOutput, numRecs, changeColors, keepColors);    
         }
     }
@@ -194,7 +192,7 @@ function changeEverythingThree(changeColors, ratio){
         return compliantMessage;
     }
     let colors = [];
-    //If any two colors match, try changing the other one
+    // If any two colors match, try changing the other one
     if(chroma.contrast(changeColorPassthrough[0].color, changeColorPassthrough[1].color) >= ratio){
         colors=colors.concat(getThirdColor([changeColorPassthrough[0], changeColorPassthrough[1]], [changeColorPassthrough[2]], ratio))
     }
@@ -218,9 +216,10 @@ function changeEverythingThree(changeColors, ratio){
     changeColorPassthrough.sort((a, b) =>{
         return a.color.luminance() - b.color.luminance();
     })
-    let changeLighter = changeColorPassthrough[0]
+    console.log("sorted colors", changeColorPassthrough);
+    let changeDarker = changeColorPassthrough[0]
     let changeMiddle = changeColorPassthrough[1] 
-    let changeDarker = changeColorPassthrough[2] 
+    let changeLighter = changeColorPassthrough[2] 
 
     compliantLums.forEach(lumSet => {
         console.log("using lumset", lumSet);
@@ -258,7 +257,6 @@ function changeOneColor(baseColor, compliantLums){
         }
     }
     compliantLums = reducedLums;
-    console.log("reduced lums", reducedLums);
     //Add a color spectrum if the color is grey, for variety
     let greyScale = baseColors.filter(color => {
         return color.lch()[1] < 15
@@ -279,7 +277,6 @@ function changeOneColor(baseColor, compliantLums){
     baseColors.forEach(baseColor => {
         returnColors = returnColors.concat(generateFromLuminosity(baseColor, compliantLums));
     })
-    console.log(returnColors);
     return returnColors.filter((color, index, array) => index === array.findIndex(compareColor => compareColor.hex() === color.hex()));
 }
 
@@ -503,8 +500,13 @@ function generateLumsThree(colors, ratio){
     console.log("with black and white", compliantLums);
     
     // Work outwards from the middle
-    // console.log(color1, color2);
-    // let averageLum = (color1 + color2)/2;
+    console.log(colors);
+    let averageLum = (colors[0].color.luminance() + colors[1].color.luminance() + colors[2].color.luminance())/2;
+    let tryGetLums = twoMoreLumsWithOriginal(averageLum, ratio);
+    console.log("tried getting compliant lums for average", tryGetLums)
+    if(tryGetLums.length > 0){
+        compliantLums = compliantLums.concat(tryGetLums);
+    }
     // let averageRec = false;
     // while(!averageRec){
     //     console.log("average lum", averageLum);
@@ -583,29 +585,63 @@ function ThreeWayChecker(color1, color2, color3, ratio){
 }
 
 export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepColors){
+    let originalColors = sortColors([changeColors.concat(keepColors)])[0];
+    //filter duplicates
+    console.log("number of results: ", colorSets.length);
+    console.log("result example", colorSets[0]);
+    colorSets = colorSets.filter((colorSet,index,colorsets)=>{
+        let matchindex = (colorsets.findIndex(colorset2=>
+            {return arraysEqual(colorset2, colorSet)}
+        ))
+        return matchindex === index;
+    });
+    console.log("after removing duplicates", colorSets.length);
+    // Reduce list from ridiculous length
+    // let reducedList =[colorSets[0]];
+    let filterDistance = 15;
+    // if(colorSets.length > 400){
+    //         for(let i=0; i<colorSets.length; i++){
+    //             let matchindex = reducedList.findIndex(set2 => {
+    //                 let distance = distanceBetweenSets(colorSets[i], set2);
+    //                 return (distance < filterDistance);
+    //             });
+    //             if(matchindex === -1){
+    //                 reducedList.push(colorSets[i]);
+    //                 console.log(reducedList);
+    //             }
+    //          }
+    // colorSets = reducedList;
+    // }
+    if(colorSets.length > 400){
+        colorSets.sort((a, b) => {
+                    return distanceBetweenSets(originalColors, a) - distanceBetweenSets(originalColors, b);
+            });
+            
+        let lessNums = Math.round(colorSets.length/200);
+        colorSets = colorSets.filter((val, index) => {
+            return index % lessNums === 0;
+        })
+    }
+    console.log("after removing excessive number", colorSets.length)
+    //Remove very similar
+    filterDistance = 1.5;
+    colorSets = colorSets.filter((set, index, array) => {
+        return index === array.findIndex(set2 => {
+            return distanceBetweenSets(set, set2) < filterDistance;
+        })
+    })
+    
+    console.log("after removing similar", colorSets.length);
     //Get most similar to original colors
-    console.log("color sets", colorSets);
-    console.log("changecolors", changeColors, "keepcolors", keepColors);
     let returnColors = [];
     if(numRecs > colorSets.length){
         numRecs = colorSets.length;
-    }
-    let originalColors = sortColors([changeColors.concat(keepColors)])[0];
-    console.log("original colors", originalColors);
-    function distanceBetweenSets(set1, set2){
-        let distances = set1.map((color, index) => {
-            return chroma.deltaE(color.color, set2[index].color);
-        });
-        let gap = distances.reduce( ( p, c ) => p + c, 0 ) / distances.length;
-        return gap;
     }
     colorSets.sort((a, b) => {
         return distanceBetweenSets(originalColors, a) - distanceBetweenSets(originalColors, b);
     })
     let remainingColors = [...colorSets.slice(1, colorSets.length)];
     returnColors.push(colorSets[0]);
-    console.log("most similar color", [...returnColors])
-    console.log('remaining colors', [...remainingColors])
     
     //Order recs by uniqueness
     for(let i=0; i<numRecs-1; i++){
@@ -614,20 +650,20 @@ export function filterSimilarColorsets(colorSets, numRecs, changeColors, keepCol
         returnColors[0].forEach((color, index) => {
             //Make list of colors in this test case position
             let colorList = returnColors.map(colorSet => {
-                console.log(colorSet);
                 return colorSet[index].color;
             })
             averageRec.push({color: chroma.average(colorList).hex(), index: index});
         })
         //Sort recs by uniqueness compared to average
+        let uniqueness = 0.9;
         remainingColors.sort((a, b) => {
-             return Math.pow(distanceBetweenSets(averageRec, b), 1.5)/distanceBetweenSets(originalColors, b) - Math.pow(distanceBetweenSets(averageRec, a),1.5)/distanceBetweenSets(originalColors, a);
+            //return (distanceBetweenSets(averageRec, a) - distanceBetweenSets(averageRec, b)) ;
+            return Math.pow(distanceBetweenSets(averageRec, b), uniqueness)/distanceBetweenSets(originalColors, b) - Math.pow(distanceBetweenSets(averageRec, a), uniqueness)/distanceBetweenSets(originalColors, a);
         })
         returnColors.push(remainingColors[0]);
         remainingColors = remainingColors.slice(1, remainingColors.length);
-        console.log("remaining colors", remainingColors, "return colors", returnColors);
     }
-        return returnColors;
+    return returnColors;
 //     return returnColors.sort((a, b) => {
 //         return distanceBetweenSets(originalColors, a) - distanceBetweenSets(originalColors, b);
 //    });
@@ -637,10 +673,6 @@ function sortColors(colorSets){
     return colorSets.map(colorSet =>{
         return colorSet.sort((a,b) => a.index - b.index);
     })
-}
-
-function checkMatch(color1, color2, matchBuffer){
-    return chroma.deltaE(color1, color2) < matchBuffer;
 }
 
 function filterFails(colorSets, ratio){
@@ -653,4 +685,21 @@ function filterFails(colorSets, ratio){
             return (chroma.contrast(colorSet[0].color, colorSet[1].color, ratio));
         })
     }
+}
+
+function arraysEqual(a, b) {  
+    //console.log(a, b);
+    for (let  i = 0; i < a.length; ++i) {
+      if (a[i].color !== b[i].color) return false;
+    }
+    return true;
+  }
+
+  function distanceBetweenSets(set1, set2){
+    let distances = set1.map((color, index) => {
+        return chroma.distance(color.color, set2[index].color);
+    });
+    let gap = distances.reduce( ( p, c ) => p + c, 0 ) / distances.length;
+    //console.log("gap", gap)
+    return gap;
 }
