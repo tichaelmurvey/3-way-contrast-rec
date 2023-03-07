@@ -337,3 +337,19 @@ button.see-more{
     font-weight: 600;
     align-self: center;
 }
+
+button.useButton{
+
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    color: white;
+    background-color: #006DFF;
+    border-radius: 6px;
+    padding: 6px;
+    float: right;
+    border: none;
+}
+
+button.useButton:hover {
+    box-shadow: 4px 4px #90bef9;
+}

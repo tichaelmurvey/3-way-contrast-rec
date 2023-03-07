@@ -139,7 +139,7 @@ function ResultContainer({colorSet, test, updateColors}){
               <p><div className="color-preview" style={{backgroundColor: color.color}} />{test.colors[color.index]}: {color.color} </p>
             </div>
       ))}
-    <button onClick={updateButtonHandler}>Use these colors</button>
+    <button className="useButton" onClick={updateButtonHandler}>Use these colors</button>
     </div>
   )
 }
