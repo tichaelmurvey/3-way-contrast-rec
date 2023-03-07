@@ -66,6 +66,7 @@ function PickerBox({color, index, changeHandler, show}){
   <div className = {"pickerPopup pickerPopup"+index} style={show ? {display: "block"} : {display: "none"}}><ChromePicker 
           color = {color}
           onChange = {pickerChangeHandler}
+          disableAlpha= {true}
         /></div>
   )
 }

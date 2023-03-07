@@ -125,8 +125,8 @@ function getTwoColors(keepColors, changeColors, ratio){
     let lighterLums = compliantLums.map(lum => {
         return lum.lighter;
     })
-    let darkerColors = changeOneColor(changeDarker.color, darkerLums);
-    let lighterColors = changeOneColor(changeLighter.color, lighterLums);
+    let darkerColors = changeOneColor(changeDarker.color, darkerLums, true);
+    let lighterColors = changeOneColor(changeLighter.color, lighterLums, true);
     darkerColors.forEach(darkColor => {
         lighterColors.forEach(lightColor => {
             colors.push([{color: darkColor.hex(), index: changeDarker.index},{color: lightColor.hex(), index: changeLighter.index}, {color: keepColor.color.hex(), index: keepColor.index}]);
