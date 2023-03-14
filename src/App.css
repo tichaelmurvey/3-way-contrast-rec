@@ -5,9 +5,14 @@
 }
 
 body{
-    margin: 48px;
     font-size: 18px;
     font-family: 'Open Sans', sans-serif;
+}
+
+.header {
+    margin-top: 48px;
+    margin-left: 48px;
+
 }
 
 .toolset {
@@ -320,6 +325,7 @@ button.get-fixes {
     border-radius: 6px;
     padding: 12px;
     border: none;
+    margin-bottom: 20px;
 }
 
 button.get-fixes:hover {
@@ -352,4 +358,24 @@ button.useButton{
 
 button.useButton:hover {
     box-shadow: 4px 4px #90bef9;
+}
+
+
+@media only screen and (max-width: 500px) {
+    .section{
+        margin: 20px auto;
+        min-width: 90%;
+    }
+    .toolset {
+        display: block;
+    }
+    .resultsContainer {
+        margin: 20px auto;
+        min-width: 90%;
+        font-size: 1.2rem;
+    }
+    .result {
+        width: 100%;
+        margin: 20px 0;
+    }
 }
