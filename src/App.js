@@ -58,8 +58,8 @@ function App() {
             <ManualRatio test={testCase} manualUpdateRatio={manualUpdateRatio}/>
           </div>
           <TestColors changeColors={handleTestColorChange} test={testCase} colors={testColors}/>
-          <Results test={testCase} colors={testColors}/>
           <Preview test={testCase} colors={testColors}/>
+          <Results test={testCase} colors={testColors}/>
         </div>
         <Fixes updateColors={handleTestColorChange} test={testCase} colors={testColors.map((color, index) => {
       return {color: color, index: index}
