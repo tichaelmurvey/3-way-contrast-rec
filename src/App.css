@@ -10,9 +10,25 @@ body{
 }
 
 .header {
-    margin-top: 48px;
+    margin: 48px 0;
     /* margin-left: 48px; */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: space-between;
+    justify-content: space-between;
+}
 
+a {
+    color:rgb(138, 0, 0);
+    font-weight: bold;
+}
+
+a:visited {
+    color:rgb(90, 0, 0);
+}
+
+h1 {
+    margin-top: 0;
 }
 
 .toolset {
@@ -378,4 +394,18 @@ button.useButton:hover {
         width: 100%;
         margin: 20px 0;
     }
+}
+
+a.buymeacoffee {
+    padding: 12px;
+    border-radius: 6px;
+    background-color: #FFDD00;
+    color: black;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+}
+
+a.buymeacoffee:hover {
+    box-shadow: 4px 4px #ffd000;
 }
