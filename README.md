@@ -6,8 +6,6 @@ There are a lot of good tools for when you need to check the contrast of two col
 
 Mine is the first that makes recommendations for 3 colors.
 
-[View the live site](https://tichaelmurvey.github.io/contrastrolabe/slider)
-
 ## Why do you need three colors
 
 Sometimes websites have more than two colors. I am personally against this frankly insane design philosophy but I am trying to be less judgemental.
